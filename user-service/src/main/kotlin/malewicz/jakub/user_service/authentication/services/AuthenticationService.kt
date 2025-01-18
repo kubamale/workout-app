@@ -1,5 +1,6 @@
 package malewicz.jakub.user_service.authentication.services
 
+import malewicz.jakub.user_service.authentication.dtos.CredentialsResponse
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
@@ -16,22 +17,22 @@ class AuthenticationService(
     private val jwtService: JwtService
 ) {
 
-    fun registerUser(registrationRequest: RegistrationRequest): String {
+    fun registerUser(registrationRequest: RegistrationRequest): CredentialsResponse {
         if (userRepository.existsByEmail(registrationRequest.email)) {
             throw BadRequestException(registrationRequest.email)
         }
 
         val user = userMapper.toUserEntity(registrationRequest)
         user.password = passwordEncoder.encode(registrationRequest.password)
-        return jwtService.generateToken(userRepository.save(user))
+        return CredentialsResponse(jwtService.generateToken(userRepository.save(user)))
     }
 
-    fun login(loginRequest: LoginRequest): String {
+    fun login(loginRequest: LoginRequest): CredentialsResponse {
         val user = userRepository.findByEmail(loginRequest.email)
             ?: throw BadRequestException("Incorrect email or password.")
 
         return if (passwordEncoder.matches(loginRequest.password, user.password)) {
-            jwtService.generateToken(user)
+            CredentialsResponse(jwtService.generateToken(user))
         } else {
             throw BadRequestException("Incorrect email or password.")
         }

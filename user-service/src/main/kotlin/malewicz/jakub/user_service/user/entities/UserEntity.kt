@@ -6,7 +6,8 @@ import java.util.*
 
 @Entity(name = "users")
 class UserEntity(
-    @Id @GeneratedValue(strategy = GenerationType.UUID) var id: UUID? = null,
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID? = null,
     var email: String,
     var firstName: String,
     var lastName: String,
