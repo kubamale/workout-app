@@ -22,4 +22,4 @@ jobs:
 
     steps:
       - run: ./gradlew clean build
-        working-directory: /user-service
+        working-directory: user-service/
