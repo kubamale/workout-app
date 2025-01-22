@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class AuthenticationController(private val authenticationService: AuthenticationService) {
 
     @PostMapping("/login")
-    fun login(@RequestBody loginRequest: LoginRequest) = authenticationService.login(loginRequest)
+    fun login(@Valid @RequestBody loginRequest: LoginRequest) = authenticationService.login(loginRequest)
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)

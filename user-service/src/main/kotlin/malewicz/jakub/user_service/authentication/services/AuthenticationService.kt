@@ -19,7 +19,7 @@ class AuthenticationService(
 
     fun registerUser(registrationRequest: RegistrationRequest): CredentialsResponse {
         if (userRepository.existsByEmail(registrationRequest.email)) {
-            throw BadRequestException(registrationRequest.email)
+            throw BadRequestException("Account with that email already exists.")
         }
 
         val user = userMapper.toUserEntity(registrationRequest)

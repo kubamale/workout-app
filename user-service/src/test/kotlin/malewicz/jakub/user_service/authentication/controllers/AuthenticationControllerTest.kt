@@ -5,6 +5,7 @@ import malewicz.jakub.user_service.authentication.dtos.CredentialsResponse
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.authentication.services.AuthenticationService
+import malewicz.jakub.user_service.exceptions.BadRequestException
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -44,6 +45,19 @@ class AuthenticationControllerTest(
     }
 
     @Test
+    fun `login should return 400 when passed incorrect credentials`() {
+        val loginRequest = LoginRequest("user@ex.com", "Password1!")
+        `when`(authenticationService.login(loginRequest)).thenThrow(BadRequestException::class.java)
+        mockMvc.perform(
+            post("/api/v1/auth/login").content(mapper.writeValueAsString(loginRequest)).contentType(
+                MediaType.APPLICATION_JSON
+            )
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
     fun `registerUser should return 201 and token when passed correct registration data`() {
         val registrationRequest = RegistrationRequest(
             "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
@@ -58,5 +72,65 @@ class AuthenticationControllerTest(
             .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.token").value("token"))
+    }
+
+    @Test
+    fun `registerUser should return 400 when passed email in incorrect format`() {
+        val registrationRequest = RegistrationRequest(
+            "userexample.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
+        )
+
+        mockMvc.perform(
+            post("/api/v1/auth/register").content(mapper.writeValueAsString(registrationRequest)).contentType(
+                MediaType.APPLICATION_JSON
+            )
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `registerUser should return 400 when passed password in incorrect format`() {
+        val registrationRequest = RegistrationRequest(
+            "user@example.com", "Password", "John", "Doe", LocalDate.now(), WeightUnits.KG
+        )
+
+        mockMvc.perform(
+            post("/api/v1/auth/register").content(mapper.writeValueAsString(registrationRequest)).contentType(
+                MediaType.APPLICATION_JSON
+            )
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `registerUser should return 400 when passed empty first name`() {
+        val registrationRequest = RegistrationRequest(
+            "user@example.com", "Password", "", "Doe", LocalDate.now(), WeightUnits.KG
+        )
+
+        mockMvc.perform(
+            post("/api/v1/auth/register").content(mapper.writeValueAsString(registrationRequest)).contentType(
+                MediaType.APPLICATION_JSON
+            )
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `registerUser should return 400 when passed empty last name`() {
+        val registrationRequest = RegistrationRequest(
+            "user@example.com", "Password", "John", "", LocalDate.now(), WeightUnits.KG
+        )
+
+        mockMvc.perform(
+            post("/api/v1/auth/register").content(mapper.writeValueAsString(registrationRequest)).contentType(
+                MediaType.APPLICATION_JSON
+            )
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
     }
 }
