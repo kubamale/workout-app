@@ -29,3 +29,5 @@ jobs:
           cache: 'gradle'
       - run: gradle --no-daemon test
         working-directory: user-service/
+      - run: gradle --no-daemon test
+        working-directory: api-gateway/
