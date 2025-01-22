@@ -22,5 +22,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - run: ./gradlew clean build
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+      - run: gradle clean build
         working-directory: user-service/
