@@ -27,6 +27,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
+
       - name: Run tests for user-service
         run: gradle --no-daemon test
         working-directory: user-service/
@@ -34,3 +35,7 @@ jobs:
       - name: Run tests for api-gateway
         run: gradle --no-daemon test
         working-directory: api-gateway/
+
+      - name: Run tests for workout-service
+        run: gradle --no-daemon test
+        working-directory: workout-service/
