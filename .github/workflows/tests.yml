@@ -27,5 +27,5 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
           cache: 'gradle'
-      - run: gradle clean build
+      - run: gradle --no-daemon test
         working-directory: user-service/
