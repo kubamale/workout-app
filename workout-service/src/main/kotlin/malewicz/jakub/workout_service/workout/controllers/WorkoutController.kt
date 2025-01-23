@@ -13,6 +13,8 @@ class WorkoutController(private val workoutService: WorkoutService) {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    fun createWorkout(@Valid @RequestBody workoutCreateRequest: WorkoutCreateRequest, @RequestHeader("User-Id") userId: UUID) =
-        workoutService.createWorkout(workoutCreateRequest, userId)
+    fun createWorkout(
+        @Valid @RequestBody workoutCreateRequest: WorkoutCreateRequest,
+        @RequestHeader("X-User-Id") userId: UUID
+    ) = workoutService.createWorkout(workoutCreateRequest, userId)
 }

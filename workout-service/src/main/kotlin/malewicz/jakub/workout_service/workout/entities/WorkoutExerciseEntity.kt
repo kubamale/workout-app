@@ -1,11 +1,6 @@
 package malewicz.jakub.workout_service.workout.entities
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 import malewicz.jakub.workout_service.exercise.entities.ExerciseEntity
 import malewicz.jakub.workout_service.set.entities.SetEntity
 import java.util.*
@@ -14,10 +9,19 @@ import java.util.*
 class WorkoutExerciseEntity(
     @Id @GeneratedValue(strategy = GenerationType.UUID)
     var id: UUID? = null,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var workout: WorkoutEntity,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     var exercise: ExerciseEntity,
-    @OneToMany(mappedBy = "workoutExercise")
+    @OneToMany(mappedBy = "workoutExercise", cascade = [CascadeType.ALL], orphanRemoval = true)
     var sets: MutableList<SetEntity> = mutableListOf(),
-)
+    var exerciseOrder: Int
+) {
+    constructor(workout: WorkoutEntity, exercise: ExerciseEntity, sets: MutableList<SetEntity>, order: Int) : this(
+        null,
+        workout,
+        exercise,
+        sets,
+        order
+    )
+}

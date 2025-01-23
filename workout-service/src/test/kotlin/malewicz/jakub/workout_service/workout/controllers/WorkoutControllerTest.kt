@@ -32,14 +32,14 @@ class WorkoutControllerTest(
         `when`(workoutService.createWorkout(createRequest, userId)).thenReturn(UUID.randomUUID())
         mockMvc.perform(
             post("/api/v1/workout").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRequest)).header("User-Id", userId)
+                .content(objectMapper.writeValueAsString(createRequest)).header("X-User-Id", userId)
         )
             .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
     }
 
     @Test
-    fun `create workout returns 400 when User-Id header not passed`() {
+    fun `create workout returns 400 when X-User-Id header not passed`() {
         val createRequest = WorkoutCreateRequest("push")
         mockMvc.perform(
             post("/api/v1/workout").contentType(MediaType.APPLICATION_JSON)
@@ -54,7 +54,7 @@ class WorkoutControllerTest(
         val userId = UUID.randomUUID()
         mockMvc.perform(
             post("/api/v1/workout").contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRequest)).header("User-Id", userId)
+                .content(objectMapper.writeValueAsString(createRequest)).header("X-User-Id", userId)
         )
             .andExpect(status().isBadRequest)
     }
