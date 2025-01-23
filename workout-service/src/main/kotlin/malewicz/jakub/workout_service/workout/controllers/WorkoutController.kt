@@ -17,4 +17,7 @@ class WorkoutController(private val workoutService: WorkoutService) {
         @Valid @RequestBody workoutCreateRequest: WorkoutCreateRequest,
         @RequestHeader("X-User-Id") userId: UUID
     ) = workoutService.createWorkout(workoutCreateRequest, userId)
+
+    @GetMapping("/all")
+    fun getUserWorkouts(@RequestHeader("X-User-Id") userId: UUID) = workoutService.getUserWorkouts(userId)
 }

@@ -2,6 +2,7 @@ package malewicz.jakub.workout_service.workout.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
+import malewicz.jakub.workout_service.workout.dtos.WorkoutResponse
 import malewicz.jakub.workout_service.workout.services.WorkoutService
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
@@ -10,9 +11,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.*
 
 @WebMvcTest(controllers = [WorkoutController::class])
@@ -57,5 +58,23 @@ class WorkoutControllerTest(
                 .content(objectMapper.writeValueAsString(createRequest)).header("X-User-Id", userId)
         )
             .andExpect(status().isBadRequest)
+    }
+
+    @Test
+    fun `get user workouts returns 200 when workout service returns workouts`() {
+        val userId = UUID.randomUUID()
+        val result =listOf(WorkoutResponse(UUID.randomUUID(), "Legs"), WorkoutResponse(UUID.randomUUID(), "Legs1"))
+        `when`(workoutService.getUserWorkouts(userId)).thenReturn(result)
+        mockMvc.perform(get("/api/v1/workout/all").header("X-User-Id", userId))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().string(objectMapper.writeValueAsString(result)))
+    }
+
+    @Test
+    fun `get user workouts returns 400 when X-User-Id header not passed`() {
+        mockMvc.perform(get("/api/v1/workout/all"))
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
     }
 }
