@@ -28,6 +28,11 @@ class Handler {
         ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.message)
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(BadRequestException::class)
+    fun handleBadRequest(ex: BadRequestException) =
+        ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.message)
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(ex: MethodArgumentNotValidException): ErrorResponse {
         val errorMessage = StringBuilder()
