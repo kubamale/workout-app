@@ -6,11 +6,11 @@ import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseEntity
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
 import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
-import malewicz.jakub.workout_service.exercise.mappers.ExerciseMapper
 import malewicz.jakub.workout_service.set.dtos.SetResponse
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
-import malewicz.jakub.workout_service.set.mappers.SetMapper
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
+import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
+import malewicz.jakub.workout_service.workout.dtos.WorkoutExerciseDetails
 import malewicz.jakub.workout_service.workout.dtos.WorkoutResponse
 import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
@@ -39,13 +39,8 @@ class WorkoutServiceTest {
     private lateinit var workoutMapper: WorkoutMapper
 
     @Mock
-    private lateinit var setMapper: SetMapper
-
-    @Mock
     private lateinit var workoutExerciseRepository: WorkoutExerciseRepository
 
-    @Mock
-    private lateinit var exerciseMapper: ExerciseMapper
 
     @InjectMocks
     private lateinit var workoutService: WorkoutService
@@ -121,27 +116,42 @@ class WorkoutServiceTest {
             Equipment.DUMBBELL
         )
         val set = WeightSetEntity(UUID.randomUUID(), 0, null, 10, 20.0)
-        `when`(workoutRepository.findById(workoutId)).thenReturn(Optional.of(WorkoutEntity(workoutId, "push", userId)))
+        val workoutExercise = WorkoutExerciseEntity(
+            UUID.randomUUID(),
+            workout,
+            exercise,
+            mutableListOf(set),
+            0
+        )
+
+        `when`(workoutRepository.findById(workoutId)).thenReturn(Optional.of(workout))
         `when`(workoutExerciseRepository.findByWorkout_Id(workoutId)).thenReturn(
             listOf(
-                WorkoutExerciseEntity(
-                    UUID.randomUUID(),
-                    workout,
-                    exercise,
-                    mutableListOf(set),
-                    0
-                )
+                workoutExercise
             )
         )
-        `when`(setMapper.toSetResponse(set)).thenReturn(SetResponse(set.id!!, set.setOrder, set.reps, set.weight))
-        `when`(exerciseMapper.toExerciseDetails(exercise)).thenReturn(
-            ExerciseDetails(
-                exercise.id!!,
-                exercise.name,
-                exercise.muscleGroup,
-                exercise.description,
-                exercise.type,
-                exercise.equipment
+
+        `when`(workoutMapper.toWorkoutDetailsResponse(workout, listOf(workoutExercise))).thenReturn(
+            WorkoutDetailsResponse(
+                workoutId,
+                workout.name,
+                mutableListOf(
+                    WorkoutExerciseDetails(
+                        workoutExercise.id!!,
+                        ExerciseDetails(
+                            exercise.id!!,
+                            exercise.name,
+                            exercise.muscleGroup,
+                            exercise.description,
+                            exercise.type,
+                            exercise.equipment
+                        ),
+                        workoutExercise.exerciseOrder,
+                        mutableListOf(
+                            SetResponse(set.id!!, set.setOrder, set.reps, set.weight)
+                        )
+                    )
+                )
             )
         )
         val result = workoutService.getWorkoutDetails(userId, workoutId)

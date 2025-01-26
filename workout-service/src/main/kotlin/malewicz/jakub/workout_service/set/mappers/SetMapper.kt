@@ -5,10 +5,10 @@ import malewicz.jakub.workout_service.set.entities.DistanceSetEntity
 import malewicz.jakub.workout_service.set.entities.SetEntity
 import malewicz.jakub.workout_service.set.entities.TimeSetEntity
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
-import org.springframework.stereotype.Component
+import org.mapstruct.Mapper
 
-@Component
-class SetMapper {
+@Mapper(componentModel = "spring")
+abstract class SetMapper {
     fun toSetResponse(set: SetEntity): SetResponse {
         return when (set) {
             is DistanceSetEntity -> SetResponse(set.id!!, set.setOrder, set.distance)
