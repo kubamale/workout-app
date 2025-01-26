@@ -60,6 +60,7 @@ class ExerciseService(
             }
         }
         workout.workoutExercises.add(newExercise)
+        newExercise.sets.forEach { it.workoutExercise = newExercise }
         return workoutRepository.save(workout).workoutExercises.find { it.exerciseOrder == exerciseOrder }?.id!!
     }
 
