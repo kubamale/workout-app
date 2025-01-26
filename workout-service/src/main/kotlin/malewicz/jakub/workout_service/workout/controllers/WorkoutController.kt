@@ -20,4 +20,9 @@ class WorkoutController(private val workoutService: WorkoutService) {
 
     @GetMapping("/all")
     fun getUserWorkouts(@RequestHeader("X-User-Id") userId: UUID) = workoutService.getUserWorkouts(userId)
+
+    @GetMapping("/{workoutId}")
+    fun getWorkoutDetails(@RequestHeader("X-User-Id") userId: UUID, @PathVariable workoutId: UUID) =
+        workoutService.getWorkoutDetails(userId, workoutId)
+
 }
