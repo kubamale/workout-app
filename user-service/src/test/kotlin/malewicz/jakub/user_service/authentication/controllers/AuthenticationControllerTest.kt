@@ -58,20 +58,17 @@ class AuthenticationControllerTest(
     }
 
     @Test
-    fun `registerUser should return 201 and token when passed correct registration data`() {
+    fun `registerUser should return 201 when passed correct registration data`() {
         val registrationRequest = RegistrationRequest(
             "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
         )
 
-        `when`(authenticationService.registerUser(registrationRequest)).thenReturn(CredentialsResponse("token"))
         mockMvc.perform(
             post("/api/v1/auth/register").content(mapper.writeValueAsString(registrationRequest)).contentType(
                 MediaType.APPLICATION_JSON
             )
         )
             .andExpect(status().isCreated)
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$.token").value("token"))
     }
 
     @Test
