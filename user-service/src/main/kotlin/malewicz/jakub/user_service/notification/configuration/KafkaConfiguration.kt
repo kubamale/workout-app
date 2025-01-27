@@ -34,6 +34,7 @@ class KafkaConfiguration(
         props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
         props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = IntegerSerializer::class.java
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java
+        props[JsonSerializer.ADD_TYPE_INFO_HEADERS] = false
         return props
     }
 
