@@ -15,6 +15,7 @@ class UserEntity(
     var dateOfBirth: LocalDate,
     @Enumerated(EnumType.ORDINAL)
     var weightUnits: WeightUnits,
+    var active: Boolean = false,
 )
 
 enum class WeightUnits {

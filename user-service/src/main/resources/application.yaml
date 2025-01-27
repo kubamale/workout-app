@@ -10,3 +10,8 @@ jwt:
   secret: ${JWT_SECRET}
   issuer: malewicz.jakub.user_service
   expiration: 10
+
+kafka:
+  topics:
+    resetPassword: reset_password
+    activateAccount: activate_account

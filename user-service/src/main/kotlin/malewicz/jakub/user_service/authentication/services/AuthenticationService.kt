@@ -4,6 +4,7 @@ import malewicz.jakub.user_service.authentication.dtos.CredentialsResponse
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
+import malewicz.jakub.user_service.notification.services.NotificationService
 import malewicz.jakub.user_service.user.mappers.UserMapper
 import malewicz.jakub.user_service.user.repositories.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -14,24 +15,28 @@ class AuthenticationService(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
     private val userMapper: UserMapper,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val notificationService: NotificationService
 ) {
 
-    fun registerUser(registrationRequest: RegistrationRequest): CredentialsResponse {
+    fun registerUser(registrationRequest: RegistrationRequest) {
         if (userRepository.existsByEmail(registrationRequest.email)) {
             throw BadRequestException("Account with that email already exists.")
         }
 
         val user = userMapper.toUserEntity(registrationRequest)
         user.password = passwordEncoder.encode(registrationRequest.password)
-        return CredentialsResponse(jwtService.generateToken(userRepository.save(user)))
+        val savedUser = userRepository.save(user)
+        notificationService.sendActivateAccountEmail(savedUser.id!!, user.email)
     }
 
     fun login(loginRequest: LoginRequest): CredentialsResponse {
         val user = userRepository.findByEmail(loginRequest.email)
             ?: throw BadRequestException("Incorrect email or password.")
 
-        return if (passwordEncoder.matches(loginRequest.password, user.password)) {
+        return if (!user.active) {
+            throw BadRequestException("Account is not active. Please activate your account by accessing link provided in your email.")
+        } else if (passwordEncoder.matches(loginRequest.password, user.password)) {
             CredentialsResponse(jwtService.generateToken(user))
         } else {
             throw BadRequestException("Incorrect email or password.")

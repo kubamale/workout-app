@@ -3,6 +3,7 @@ package malewicz.jakub.user_service.authentication.services
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
+import malewicz.jakub.user_service.notification.services.NotificationService
 import malewicz.jakub.user_service.user.entities.UserEntity
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import malewicz.jakub.user_service.user.mappers.UserMapper
@@ -15,6 +16,7 @@ import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito.given
 import org.mockito.InjectMocks
 import org.mockito.Mock
+import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -26,16 +28,14 @@ class AuthenticationServiceTest {
 
     @Mock
     lateinit var userRepository: UserRepository
-
     @Mock
     lateinit var passwordEncoder: PasswordEncoder
-
     @Mock
     lateinit var jwtService: JwtService
-
     @Mock
     lateinit var userMapper: UserMapper
-
+    @Mock
+    lateinit var notificationService: NotificationService
     @InjectMocks
     lateinit var authenticationService: AuthenticationService
 
@@ -48,7 +48,7 @@ class AuthenticationServiceTest {
     }
 
     @Test
-    fun registerUser_givenCorrectData_returnsToken() {
+    fun `register user should save new user and send notification`() {
         val registrationRequest = RegistrationRequest(
             "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
         )
@@ -75,10 +75,10 @@ class AuthenticationServiceTest {
         given(userMapper.toUserEntity(registrationRequest)).willReturn(user)
         given(passwordEncoder.encode(registrationRequest.password)).willReturn(registrationRequest.password)
         given(userRepository.save(user)).willReturn(savedUser)
-        given(jwtService.generateToken(savedUser)).willReturn("token")
 
-        val credentials = authenticationService.registerUser(registrationRequest)
-        assertThat(credentials.token).isNotEmpty()
+        authenticationService.registerUser(registrationRequest)
+        verify(userRepository).save(user)
+        verify(notificationService).sendActivateAccountEmail(savedUser.id!!, user.email)
     }
 
     @Test
@@ -99,10 +99,28 @@ class AuthenticationServiceTest {
                 "John",
                 "Doe",
                 LocalDate.now(),
-                WeightUnits.KG
+                WeightUnits.KG,
+                true
             )
         )
         `when`(passwordEncoder.matches(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenReturn(false)
+        assertThrows<BadRequestException> { authenticationService.login(loginRequest) }
+    }
+
+    @Test
+    fun `login should throw BadRequestException when user is not active`() {
+        val loginRequest = LoginRequest("user@example.com", "Password1!")
+        val user = UserEntity(
+            UUID.randomUUID(),
+            "user@example.com",
+            "Password1!",
+            "John",
+            "Doe",
+            LocalDate.now(),
+            WeightUnits.KG,
+            false
+        )
+        `when`(userRepository.findByEmail(ArgumentMatchers.anyString())).thenReturn(user)
         assertThrows<BadRequestException> { authenticationService.login(loginRequest) }
     }
 
@@ -116,7 +134,8 @@ class AuthenticationServiceTest {
             "John",
             "Doe",
             LocalDate.now(),
-            WeightUnits.KG
+            WeightUnits.KG,
+            true
         )
         `when`(userRepository.findByEmail(ArgumentMatchers.anyString())).thenReturn(user)
         `when`(passwordEncoder.matches(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenReturn(true)
