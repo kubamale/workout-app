@@ -3,6 +3,7 @@ package malewicz.jakub.user_service.authentication.services
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
+import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.notification.services.NotificationService
 import malewicz.jakub.user_service.user.entities.UserEntity
 import malewicz.jakub.user_service.user.entities.WeightUnits
@@ -28,14 +29,19 @@ class AuthenticationServiceTest {
 
     @Mock
     lateinit var userRepository: UserRepository
+
     @Mock
     lateinit var passwordEncoder: PasswordEncoder
+
     @Mock
     lateinit var jwtService: JwtService
+
     @Mock
     lateinit var userMapper: UserMapper
+
     @Mock
     lateinit var notificationService: NotificationService
+
     @InjectMocks
     lateinit var authenticationService: AuthenticationService
 
@@ -142,5 +148,34 @@ class AuthenticationServiceTest {
         `when`(jwtService.generateToken(user)).thenReturn("token")
         val credentials = authenticationService.login(loginRequest)
         assertThat(credentials.token).isNotEmpty()
+    }
+
+    @Test
+    fun `activate account should throw ResourceNotFoundExecption when no user with provided id exists`() {
+        val userId = UUID.randomUUID()
+        `when`(userRepository.findById(userId)).thenReturn(Optional.empty())
+        assertThrows<ResourceNotFoundException> { authenticationService.activateAccount(userId) }
+    }
+
+    @Test
+    fun `activate account should save user`() {
+        val userId = UUID.randomUUID()
+        val user = UserEntity(
+            userId,
+            "email@ex.com",
+            "John",
+            "Doe",
+            "Password1!",
+            LocalDate.now(),
+            WeightUnits.KG
+        )
+        `when`(userRepository.findById(userId)).thenReturn(
+            Optional.of(
+                user
+            )
+        )
+
+        authenticationService.activateAccount(userId)
+        verify(userRepository).save(user)
     }
 }

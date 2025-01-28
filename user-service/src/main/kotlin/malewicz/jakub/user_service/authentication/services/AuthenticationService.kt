@@ -4,11 +4,13 @@ import malewicz.jakub.user_service.authentication.dtos.CredentialsResponse
 import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
+import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.notification.services.NotificationService
 import malewicz.jakub.user_service.user.mappers.UserMapper
 import malewicz.jakub.user_service.user.repositories.UserRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AuthenticationService(
@@ -41,5 +43,12 @@ class AuthenticationService(
         } else {
             throw BadRequestException("Incorrect email or password.")
         }
+    }
+
+    fun activateAccount(userId: UUID) {
+        val user =
+            userRepository.findById(userId).orElseThrow { ResourceNotFoundException("No user with id $userId exists.") }
+        user.active = true
+        userRepository.save(user)
     }
 }

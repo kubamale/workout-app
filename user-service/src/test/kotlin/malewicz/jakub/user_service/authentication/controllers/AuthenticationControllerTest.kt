@@ -6,6 +6,7 @@ import malewicz.jakub.user_service.authentication.dtos.LoginRequest
 import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.authentication.services.AuthenticationService
 import malewicz.jakub.user_service.exceptions.BadRequestException
+import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -19,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.time.LocalDate
+import java.util.*
 
 @ExtendWith(MockitoExtension::class)
 @WebMvcTest(controllers = [AuthenticationController::class])
@@ -129,5 +131,21 @@ class AuthenticationControllerTest(
         )
             .andExpect(status().isBadRequest)
             .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `activateAccount should return 200 when activated account data`() {
+        mockMvc.perform(
+            post("/api/v1/auth/activate/${UUID.randomUUID()}")
+        ).andExpect(status().isOk)
+    }
+
+    @Test
+    fun `activateAccount should return 404 when no user was found`() {
+        val userId = UUID.randomUUID()
+        `when`(authenticationService.activateAccount(userId)).thenThrow(ResourceNotFoundException::class.java)
+        mockMvc.perform(
+            post("/api/v1/auth/activate/${userId}")
+        ).andExpect(status().isNotFound)
     }
 }
