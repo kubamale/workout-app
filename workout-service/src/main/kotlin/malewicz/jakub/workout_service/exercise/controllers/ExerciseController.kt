@@ -9,6 +9,8 @@ import malewicz.jakub.workout_service.exercise.services.ExerciseService
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
+import malewicz.jakub.workout_service.weight.WeightConverter
+import malewicz.jakub.workout_service.weight.WeightUnits
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -16,7 +18,10 @@ import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/exercise")
-class ExerciseController(private val exerciseService: ExerciseService) {
+class ExerciseController(
+    private val exerciseService: ExerciseService,
+    private val weightConverter: WeightConverter
+) {
 
     @GetMapping("/{id}")
     fun getDetails(@PathVariable id: UUID) = exerciseService.getExerciseDetails(id)
@@ -35,20 +40,33 @@ class ExerciseController(private val exerciseService: ExerciseService) {
     @PostMapping("/weight")
     fun addWeightExerciseToWorkout(
         @Valid @RequestBody exerciseRequest: ExerciseCreateRequest<WeightSetCreateRequest>,
-        @RequestHeader("X-User-Id") userId: UUID
-    ) = exerciseService.addExerciseToWorkout(exerciseRequest, userId)
+        @RequestHeader("X-User-Id") userId: UUID,
+        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits
+    ): UUID {
+        if (weightUnits != WeightUnits.KG) {
+            exerciseRequest.sets.forEach { it.weight = weightConverter.toKilograms(it.weight) }
+        }
+        return exerciseService.addExerciseToWorkout(exerciseRequest, userId)
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/time")
     fun addTimeExerciseToWorkout(
         @Valid @RequestBody exerciseRequest: ExerciseCreateRequest<TimeSetCreateRequest>,
-        @RequestHeader("X-User-Id") userId: UUID
-    ) = exerciseService.addExerciseToWorkout(exerciseRequest, userId)
+        @RequestHeader("X-User-Id") userId: UUID,
+        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits
+    ): UUID {
+        if (weightUnits != WeightUnits.KG) {
+            exerciseRequest.sets.forEach { it.weight = weightConverter.toKilograms(it.weight) }
+        }
+        return exerciseService.addExerciseToWorkout(exerciseRequest, userId)
+    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/distance")
     fun addDistanceExerciseToWorkout(
         @Valid @RequestBody exerciseRequest: ExerciseCreateRequest<DistanceSetCreateRequest>,
-        @RequestHeader("X-User-Id") userId: UUID
+        @RequestHeader("X-User-Id") userId: UUID,
+        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits
     ) = exerciseService.addExerciseToWorkout(exerciseRequest, userId)
 }
