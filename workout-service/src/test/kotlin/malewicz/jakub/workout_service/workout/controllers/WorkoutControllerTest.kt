@@ -6,6 +6,7 @@ import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
 import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
 import malewicz.jakub.workout_service.set.dtos.SetResponse
+import malewicz.jakub.workout_service.weight.WeightConverter
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
 import malewicz.jakub.workout_service.workout.dtos.WorkoutExerciseDetails
@@ -30,6 +31,8 @@ class WorkoutControllerTest(
     @Autowired private val objectMapper: ObjectMapper,
 ) {
 
+    @MockitoBean
+    private lateinit var weightConverter: WeightConverter
     @MockitoBean
     private lateinit var workoutService: WorkoutService
 
@@ -116,7 +119,71 @@ class WorkoutControllerTest(
         )
 
         `when`(workoutService.getWorkoutDetails(userId, workoutId)).thenReturn(response)
-        mockMvc.perform(get("/api/v1/workout/$workoutId").header("X-User-Id", userId))
+        mockMvc.perform(get("/api/v1/workout/$workoutId").header("X-User-Id", userId).header("X-Weight-Units", "KG"))
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().string(objectMapper.writeValueAsString(response)))
+    }
+
+    @Test
+    fun `get  workout details returns 200 and converts weight to pounds when workout service returns workouts`() {
+        val userId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        val exerciseId = UUID.randomUUID()
+        val exerciseDetailsId = UUID.randomUUID()
+        val setId = UUID.randomUUID()
+        val serviceResponse = WorkoutDetailsResponse(
+            workoutId, "Legs", mutableListOf(
+                WorkoutExerciseDetails(
+                    exerciseId,
+                    ExerciseDetails(
+                        exerciseDetailsId,
+                        "biceps",
+                        MuscleGroup.BICEPS,
+                        "desc",
+                        ExerciseType.STRENGTH,
+                        Equipment.DUMBBELL
+                    ),
+                    0,
+                    mutableListOf(
+                        SetResponse(
+                            setId,
+                            0,
+                            10,
+                            20.0
+                        )
+                    )
+                )
+            )
+        )
+        val response = WorkoutDetailsResponse(
+            workoutId, "Legs", mutableListOf(
+                WorkoutExerciseDetails(
+                    exerciseId,
+                    ExerciseDetails(
+                        exerciseDetailsId,
+                        "biceps",
+                        MuscleGroup.BICEPS,
+                        "desc",
+                        ExerciseType.STRENGTH,
+                        Equipment.DUMBBELL
+                    ),
+                    0,
+                    mutableListOf(
+                        SetResponse(
+                            setId,
+                            0,
+                            10,
+                            50.0
+                        )
+                    )
+                )
+            )
+        )
+
+        `when`(weightConverter.fromKilograms(20.0)).thenReturn(50.0)
+        `when`(workoutService.getWorkoutDetails(userId, workoutId)).thenReturn(serviceResponse)
+        mockMvc.perform(get("/api/v1/workout/$workoutId").header("X-User-Id", userId).header("X-Weight-Units", "LB"))
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().string(objectMapper.writeValueAsString(response)))

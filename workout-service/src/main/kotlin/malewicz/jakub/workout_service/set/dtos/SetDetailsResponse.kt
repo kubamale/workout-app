@@ -6,7 +6,7 @@ data class SetResponse(
     val id: UUID,
     val order: Int,
     val reps: Int?,
-    val weight: Double?,
+    var weight: Double?,
     val time: Long?,
     val distance: Double?,
     val type: SetType

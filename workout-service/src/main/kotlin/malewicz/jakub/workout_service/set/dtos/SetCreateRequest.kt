@@ -16,7 +16,7 @@ data class TimeSetCreateRequest(
     val setNumber: Int,
     val time: Long,
     @field:Min(0)
-    val weight: Double
+    var weight: Double
 )
 
 
@@ -27,5 +27,5 @@ data class WeightSetCreateRequest(
     @field:Min(0)
     val reps: Int,
     @field:Min(0)
-    val weight: Double
+    var weight: Double
 )
