@@ -9,3 +9,6 @@ spring:
       discovery:
         locator:
           enabled: true
+jwt:
+  secret: ${JWT_TOKEN}
+  issuer: ${JWT_ISSUER}
