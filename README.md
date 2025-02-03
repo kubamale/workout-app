@@ -9,7 +9,7 @@ managing workouts and exercises while providing a robust and maintainable codeba
 
 ## System Architecture
 
-![System architecture](/images/architecture.png)
+![System architecture](/.images/architecture.png)
 Application is composed of multiple services. It is following the API Gateway pattern.
 There for the business services can stay in private network and the only component that will be exposed to public
 network,
