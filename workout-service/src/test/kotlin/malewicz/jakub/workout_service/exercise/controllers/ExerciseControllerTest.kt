@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseDetails
+import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
 import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
@@ -20,8 +21,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 import java.util.*
 
@@ -254,5 +254,16 @@ class ExerciseControllerTest(
             .andExpect(status().isCreated)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(objectMapper.writeValueAsString(exerciseId)))
+    }
+
+    @Test
+    fun `reorder exercises should return 200`() {
+        val request = ExerciseReorderRequest(UUID.randomUUID(), mapOf(Pair(UUID.randomUUID(), 1)))
+        val userId = UUID.randomUUID()
+        mockMvc.perform(
+            patch("/api/v1/exercise/order").contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)).header("X-User-Id", userId)
+        )
+            .andExpect(status().isOk)
     }
 }
