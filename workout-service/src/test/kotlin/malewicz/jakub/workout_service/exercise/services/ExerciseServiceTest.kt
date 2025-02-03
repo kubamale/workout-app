@@ -1,9 +1,11 @@
 package malewicz.jakub.workout_service.exercise.services
 
 import malewicz.jakub.workout_service.dtos.FilterRequest
+import malewicz.jakub.workout_service.exceptions.BadRequestException
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseDetails
+import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseEntity
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
@@ -261,5 +263,64 @@ class ExerciseServiceTest {
         assertThat(result.totalElements).isEqualTo(1)
         assertThat(result.totalPages).isEqualTo(1)
         assertThat(result.hasNextPage).isFalse()
+    }
+
+    @Test
+    fun `reorder exercises should throw ResourceNotFoundException when Workout was not found`() {
+        val userId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        val request = ExerciseReorderRequest(workoutId, hashMapOf())
+        `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.empty())
+        assertThrows<ResourceNotFoundException> { exerciseService.reorderExercises(request, userId) }
+    }
+
+    @Test
+    fun `reorder exercises should throw BadRequestException when passed incorrect map size`() {
+        val userId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        val exerciseId1 = UUID.randomUUID()
+        val exerciseId2 = UUID.randomUUID()
+        val request = ExerciseReorderRequest(workoutId, hashMapOf(Pair(exerciseId1, 1)))
+        val exercise = ExerciseEntity(
+            UUID.randomUUID(),
+            "curls",
+            MuscleGroup.BICEPS,
+            "description",
+            ExerciseType.STRENGTH,
+            Equipment.DUMBBELL
+        )
+        val workout = WorkoutEntity(workoutId, "legs", userId, mutableListOf())
+        val ex1 = WorkoutExerciseEntity(exerciseId1, workout, exercise, mutableListOf(), 0)
+        val ex2 = WorkoutExerciseEntity(exerciseId2, workout, exercise, mutableListOf(), 1)
+        workout.workoutExercises = mutableListOf(ex1, ex2)
+
+        `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
+        assertThrows<BadRequestException> { exerciseService.reorderExercises(request, userId) }
+    }
+
+    @Test
+    fun `reorder exercises should throw BadRequestException when passed incorrect id in map`() {
+        val userId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        val exerciseId1 = UUID.randomUUID()
+        val exerciseId2 = UUID.randomUUID()
+        val request = ExerciseReorderRequest(workoutId, hashMapOf(Pair(exerciseId1, 1), Pair(exerciseId2, 0)))
+        val exercise = ExerciseEntity(
+            UUID.randomUUID(),
+            "curls",
+            MuscleGroup.BICEPS,
+            "description",
+            ExerciseType.STRENGTH,
+            Equipment.DUMBBELL
+        )
+        val workout = WorkoutEntity(workoutId, "legs", userId, mutableListOf())
+        val ex1 = WorkoutExerciseEntity(exerciseId1, workout, exercise, mutableListOf(), 0)
+        val ex2 = WorkoutExerciseEntity(exerciseId2, workout, exercise, mutableListOf(), 1)
+        workout.workoutExercises = mutableListOf(ex1, ex2)
+
+        `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
+        exerciseService.reorderExercises(request, userId)
+        assertThat(workout.workoutExercises.find { it.id == exerciseId1 }?.exerciseOrder).isEqualTo(1)
+        assertThat(workout.workoutExercises.find { it.id == exerciseId2 }?.exerciseOrder).isEqualTo(0)
     }
 }

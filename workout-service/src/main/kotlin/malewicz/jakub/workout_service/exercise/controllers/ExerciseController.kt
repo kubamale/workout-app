@@ -5,6 +5,7 @@ import malewicz.jakub.workout_service.dtos.FilterRequest
 import malewicz.jakub.workout_service.dtos.PageableResponse
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseBasicsResponse
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
+import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.services.ExerciseService
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
@@ -69,4 +70,12 @@ class ExerciseController(
         @RequestHeader("X-User-Id") userId: UUID,
         @RequestHeader("X-Weight-Units") weightUnits: WeightUnits
     ) = exerciseService.addExerciseToWorkout(exerciseRequest, userId)
+
+
+    @PatchMapping("/order")
+    fun reorderExercises(
+        @RequestHeader("X-User-Id") userId: UUID,
+        @RequestBody reorderRequest: ExerciseReorderRequest
+    ) =
+        exerciseService.reorderExercises(reorderRequest, userId)
 }

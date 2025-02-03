@@ -2,9 +2,11 @@ package malewicz.jakub.workout_service.exercise.services
 
 import malewicz.jakub.workout_service.dtos.FilterRequest
 import malewicz.jakub.workout_service.dtos.PageableResponse
+import malewicz.jakub.workout_service.exceptions.BadRequestException
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseBasicsResponse
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
+import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.mappers.ExerciseMapper
 import malewicz.jakub.workout_service.exercise.repositories.ExerciseRepository
 import malewicz.jakub.workout_service.exercise.repositories.ExerciseSpecification
@@ -48,7 +50,7 @@ class ExerciseService(
 
     fun addExerciseToWorkout(exerciseRequest: ExerciseCreateRequest<*>, userId: UUID): UUID {
         val workout = workoutRepository.findByIdAndUserId(exerciseRequest.workoutId, userId)
-            .orElseThrow { ResourceNotFoundException("No workout with id ${exerciseRequest.workoutId} found for user id ${exerciseRequest.workoutId}") }
+            .orElseThrow { ResourceNotFoundException("No workout with id ${exerciseRequest.workoutId} found for user id $userId") }
         val exercise = exerciseRepository.findById(exerciseRequest.exerciseId)
             .orElseThrow { ResourceNotFoundException("No exercise found for id ${exerciseRequest.exerciseId}") }
         val sets: MutableList<SetEntity> = createSets(exerciseRequest)
@@ -62,6 +64,18 @@ class ExerciseService(
         workout.workoutExercises.add(newExercise)
         newExercise.sets.forEach { it.workoutExercise = newExercise }
         return workoutRepository.save(workout).workoutExercises.find { it.exerciseOrder == exerciseOrder }?.id!!
+    }
+
+    fun reorderExercises(reorderRequest: ExerciseReorderRequest, userId: UUID) {
+        val workout = workoutRepository.findByIdAndUserId(reorderRequest.workoutId, userId)
+            .orElseThrow { ResourceNotFoundException("No workout with id ${reorderRequest.workoutId} found for user id $userId") }
+        if (reorderRequest.exerciseOrder.size != workout.workoutExercises.size) {
+            throw BadRequestException("Reorder map size is ${reorderRequest.exerciseOrder.size} but expected to find ${workout.workoutExercises.size}.")
+        }
+        workout.workoutExercises.sortedBy {
+            reorderRequest.exerciseOrder[it.id] ?: throw BadRequestException("No exercise found for id $userId")
+        }.forEachIndexed { index, exercise -> exercise.exerciseOrder = index }
+        workoutRepository.save(workout)
     }
 
     private fun createSets(exerciseRequest: ExerciseCreateRequest<*>): MutableList<SetEntity> {
