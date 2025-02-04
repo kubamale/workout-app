@@ -68,7 +68,6 @@ class ExerciseController(
     fun addDistanceExerciseToWorkout(
         @Valid @RequestBody exerciseRequest: ExerciseCreateRequest<DistanceSetCreateRequest>,
         @RequestHeader("X-User-Id") userId: UUID,
-        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits
     ) = exerciseService.addExerciseToWorkout(exerciseRequest, userId)
 
 
