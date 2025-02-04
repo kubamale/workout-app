@@ -6,7 +6,7 @@ import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseEntity
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
 import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
-import malewicz.jakub.workout_service.set.dtos.SetResponse
+import malewicz.jakub.workout_service.set.dtos.SetDetailsDto
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
@@ -148,7 +148,7 @@ class WorkoutServiceTest {
                         ),
                         workoutExercise.exerciseOrder,
                         mutableListOf(
-                            SetResponse(set.id!!, set.setOrder, set.reps, set.weight)
+                            SetDetailsDto(set.id!!, set.setOrder, set.reps, set.weight)
                         )
                     )
                 )

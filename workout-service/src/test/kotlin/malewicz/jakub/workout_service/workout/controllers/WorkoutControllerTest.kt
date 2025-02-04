@@ -5,7 +5,7 @@ import malewicz.jakub.workout_service.exercise.dtos.ExerciseDetails
 import malewicz.jakub.workout_service.exercise.entities.Equipment
 import malewicz.jakub.workout_service.exercise.entities.ExerciseType
 import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
-import malewicz.jakub.workout_service.set.dtos.SetResponse
+import malewicz.jakub.workout_service.set.dtos.SetDetailsDto
 import malewicz.jakub.workout_service.weight.WeightConverter
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
@@ -107,7 +107,7 @@ class WorkoutControllerTest(
                     ),
                     0,
                     mutableListOf(
-                        SetResponse(
+                        SetDetailsDto(
                             UUID.randomUUID(),
                             0,
                             10,
@@ -146,7 +146,7 @@ class WorkoutControllerTest(
                     ),
                     0,
                     mutableListOf(
-                        SetResponse(
+                        SetDetailsDto(
                             setId,
                             0,
                             10,
@@ -170,7 +170,7 @@ class WorkoutControllerTest(
                     ),
                     0,
                     mutableListOf(
-                        SetResponse(
+                        SetDetailsDto(
                             setId,
                             0,
                             10,

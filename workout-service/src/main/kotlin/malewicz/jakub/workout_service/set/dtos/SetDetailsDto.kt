@@ -2,8 +2,8 @@ package malewicz.jakub.workout_service.set.dtos
 
 import java.util.*
 
-data class SetResponse(
-    val id: UUID,
+data class SetDetailsDto(
+    val id: UUID?,
     val order: Int,
     val reps: Int?,
     var weight: Double?,
