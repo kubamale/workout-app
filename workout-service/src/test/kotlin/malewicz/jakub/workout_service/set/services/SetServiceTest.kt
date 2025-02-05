@@ -54,24 +54,6 @@ class SetServiceTest {
     }
 
     @Test
-    fun `update sets should throw BadRequestException when incorrect amount of sets passed`() {
-        val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exercise, mutableListOf(), 0)
-        `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
-        `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(
-            mutableListOf(
-                WeightSetEntity(
-                    UUID.randomUUID(),
-                    0,
-                    workoutExercise,
-                    10,
-                    10.0
-                )
-            )
-        )
-        assertThrows<BadRequestException> { setService.updateSets(mutableListOf(), workoutExercise.id!!) }
-    }
-
-    @Test
     fun `update sets should throw BadRequestException when weight not set in WeightSet`() {
         val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exercise, mutableListOf(), 0)
         val set = WeightSetEntity(UUID.randomUUID(), 0, workoutExercise, 10, 10.0)

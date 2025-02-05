@@ -1,5 +1,6 @@
 package malewicz.jakub.workout_service.set.services
 
+import jakarta.transaction.Transactional
 import malewicz.jakub.workout_service.exceptions.BadRequestException
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.set.dtos.SetDetailsDto
@@ -19,17 +20,17 @@ class SetService(
     private val setRepository: SetRepository,
     private val workoutExerciseRepository: WorkoutExerciseRepository
 ) {
+    @Transactional
     fun updateSets(setsDetails: List<SetDetailsDto>, workoutExerciseId: UUID) {
         val workoutExercise = workoutExerciseRepository.findById(workoutExerciseId).orElseThrow {
             ResourceNotFoundException("No workout exercise with id $workoutExerciseId.")
         }
-        val passedExistingSets = setsDetails.count { it.id != null }
         val existingSets = setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)
-        if (passedExistingSets != existingSets.size) {
-            throw BadRequestException("Expected ${existingSets.size} sets with id passed but found $passedExistingSets.")
-        }
+        val passedSetsIds = setsDetails.mapNotNull { it.id }
+        val setsToDelete = existingSets.filter { !passedSetsIds.contains(it.id) }
+        val setsToSave = existingSets.filter { passedSetsIds.contains(it.id) }
 
-        existingSets.forEach { set ->
+        setsToSave.forEach { set ->
             val updatedSet =
                 setsDetails.firstOrNull { it.id == set.id } ?: throw BadRequestException("Incorrect set id passed.")
             updateSet(set, updatedSet)
@@ -39,10 +40,11 @@ class SetService(
             createNewSet(workoutExercise, it)
         }
 
-        val allSets = (existingSets + newSets).sortedBy { it.setOrder }.mapIndexed { index, set ->
+        val allSets = (setsToSave + newSets).sortedBy { it.setOrder }.mapIndexed { index, set ->
             set.apply { setOrder = index }
         }
 
+        setRepository.deleteAll(setsToDelete)
         setRepository.saveAll(allSets)
     }
 
