@@ -77,4 +77,7 @@ class ExerciseController(
         @RequestBody reorderRequest: ExerciseReorderRequest
     ) =
         exerciseService.reorderExercises(reorderRequest, userId)
+
+    @DeleteMapping("/{id}")
+    fun deleteFromWorkout(@PathVariable id: UUID, @RequestParam workoutId: UUID) = exerciseService.deleteFromWorkout(id, workoutId)
 }
