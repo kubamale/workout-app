@@ -16,6 +16,8 @@ class UserEntity(
     @Enumerated(EnumType.ORDINAL)
     var weightUnits: WeightUnits,
     var active: Boolean = false,
+    @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
+    var resetPasswords: MutableList<ResetPasswordEntity> = mutableListOf(),
 )
 
 enum class WeightUnits {
