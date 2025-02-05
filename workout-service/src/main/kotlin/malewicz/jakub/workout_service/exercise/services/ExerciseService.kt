@@ -19,6 +19,7 @@ import malewicz.jakub.workout_service.set.entities.TimeSetEntity
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
+import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -29,6 +30,7 @@ class ExerciseService(
     private val exerciseMapper: ExerciseMapper,
     private val exerciseRepository: ExerciseRepository,
     private val workoutRepository: WorkoutRepository,
+    private val workoutExerciseRepository: WorkoutExerciseRepository
 ) {
     fun getExerciseDetails(id: UUID) =
         exerciseMapper.toExerciseDetails(
@@ -102,5 +104,11 @@ class ExerciseService(
 
     private fun getNewExercisesOrder(workout: WorkoutEntity, order: Int): Int {
         return if (order > workout.workoutExercises.size) workout.workoutExercises.size else order
+    }
+
+    fun deleteFromWorkout(id: UUID, workoutId: UUID) {
+        val workoutExercise = workoutExerciseRepository.findByIdAndWorkoutId(id, workoutId)
+            .orElseThrow { ResourceNotFoundException("No exercise $id found in workout $workoutId.") }
+        workoutExerciseRepository.delete(workoutExercise)
     }
 }

@@ -17,6 +17,7 @@ import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
 import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
+import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -43,6 +44,9 @@ class ExerciseServiceTest {
 
     @Mock
     private lateinit var workoutRepository: WorkoutRepository
+
+    @Mock
+    private lateinit var workoutExerciseRepository: WorkoutExerciseRepository
 
     @InjectMocks
     private lateinit var exerciseService: ExerciseService
@@ -322,5 +326,35 @@ class ExerciseServiceTest {
         exerciseService.reorderExercises(request, userId)
         assertThat(workout.workoutExercises.find { it.id == exerciseId1 }?.exerciseOrder).isEqualTo(1)
         assertThat(workout.workoutExercises.find { it.id == exerciseId2 }?.exerciseOrder).isEqualTo(0)
+    }
+
+    @Test
+    fun `delete from workout should throw ResourceNotFoundException when exercise in workout was not found`() {
+        val exerciseId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        `when`(workoutExerciseRepository.findByIdAndWorkoutId(exerciseId, workoutId)).thenReturn(Optional.empty())
+
+        assertThrows<ResourceNotFoundException> { exerciseService.deleteFromWorkout(exerciseId, workoutId) }
+    }
+
+    @Test
+    fun `delete from workout should delete exercise`() {
+        val exerciseId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        val workout = WorkoutEntity(workoutId, "legs", UUID.randomUUID())
+        val exercise = ExerciseEntity(
+            UUID.randomUUID(),
+            "curls",
+            MuscleGroup.BICEPS,
+            "description",
+            ExerciseType.STRENGTH,
+            Equipment.DUMBBELL
+        )
+        val workoutExercise = WorkoutExerciseEntity(exerciseId, workout, exercise, mutableListOf(), 0)
+        `when`(workoutExerciseRepository.findByIdAndWorkoutId(exerciseId, workoutId)).thenReturn(
+            Optional.of(workoutExercise)
+        )
+        exerciseService.deleteFromWorkout(exerciseId, workoutId)
+        verify(workoutExerciseRepository).delete(workoutExercise)
     }
 }

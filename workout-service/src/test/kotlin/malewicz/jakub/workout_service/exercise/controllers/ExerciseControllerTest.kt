@@ -266,4 +266,12 @@ class ExerciseControllerTest(
         )
             .andExpect(status().isOk)
     }
+
+    @Test
+    fun `delete from workout returns 200`() {
+        val exerciseId = UUID.randomUUID()
+        val workoutId = UUID.randomUUID()
+        mockMvc.perform(delete("/api/v1/exercise/{exerciseId}", exerciseId).param("workoutId", workoutId.toString()))
+            .andExpect(status().isOk)
+    }
 }
