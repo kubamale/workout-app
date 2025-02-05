@@ -1,10 +1,9 @@
 package malewicz.jakub.user_service.authentication.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import malewicz.jakub.user_service.authentication.dtos.CredentialsResponse
-import malewicz.jakub.user_service.authentication.dtos.LoginRequest
-import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
+import malewicz.jakub.user_service.authentication.dtos.*
 import malewicz.jakub.user_service.authentication.services.AuthenticationService
+import malewicz.jakub.user_service.authentication.services.PasswordService
 import malewicz.jakub.user_service.exceptions.BadRequestException
 import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.user.entities.WeightUnits
@@ -31,6 +30,9 @@ class AuthenticationControllerTest(
 
     @MockitoBean
     private lateinit var authenticationService: AuthenticationService
+
+    @MockitoBean
+    private lateinit var passwordService: PasswordService
 
     @Test
     fun `login should return 200 and token when passed correct login data`() {
@@ -147,5 +149,59 @@ class AuthenticationControllerTest(
         mockMvc.perform(
             post("/api/v1/auth/activate/${userId}")
         ).andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `forgot password should return 400 when passed incorrect email format`() {
+        val requestBody = ForgotPasswordRequest("bademail.com")
+        mockMvc.perform(
+            post("/api/v1/auth/forgot-password").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(requestBody))
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+
+    @Test
+    fun `forgot password should return 200 when passed correct email format`() {
+        val requestBody = ForgotPasswordRequest("test@ex.com")
+        mockMvc.perform(
+            post("/api/v1/auth/forgot-password").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(requestBody))
+        )
+            .andExpect(status().isOk)
+    }
+
+    @Test
+    fun `reset password should return 400 when passed empty token`() {
+        val requestBody = ResetPasswordRequest("", "Password1!")
+        mockMvc.perform(
+            post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(requestBody))
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `reset password should return 400 when passed incorrect password format`() {
+        val requestBody = ResetPasswordRequest("token", "password")
+        mockMvc.perform(
+            post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(requestBody))
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `reset password should return 200 when passed correct data`() {
+        val requestBody = ResetPasswordRequest("token", "Password1!")
+        mockMvc.perform(
+            post("/api/v1/auth/reset-password").contentType(MediaType.APPLICATION_JSON)
+                .content(mapper.writeValueAsString(requestBody))
+        )
+            .andExpect(status().isOk)
     }
 }
