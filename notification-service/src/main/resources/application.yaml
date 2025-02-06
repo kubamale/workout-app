@@ -19,5 +19,10 @@ server:
 kafka:
   topic:
     activateAccount: activate_account
+    resetPassword: reset_password
 gymapp:
-  activationUrl: http://localhost:8080/activate
+  activation:
+    url: http://localhost:8080/activate
+  resetPassword:
+    url: http://localhost:8080/reset-password
+  email: ${GYM_APP_EMAIL}
