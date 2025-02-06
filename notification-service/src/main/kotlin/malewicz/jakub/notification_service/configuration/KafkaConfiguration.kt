@@ -1,6 +1,7 @@
 package malewicz.jakub.notification_service.configuration
 
-import malewicz.jakub.notification_service.listeners.ActivateAccountMessage
+import malewicz.jakub.notification_service.dtos.ActivateAccountMessage
+import malewicz.jakub.notification_service.dtos.ResetPasswordMessage
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.IntegerDeserializer
 import org.springframework.context.annotation.Bean
@@ -15,7 +16,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer
 class KafkaConfiguration {
 
     @Bean
-    fun consumerFactory(): ConsumerFactory<Int, ActivateAccountMessage> {
+    fun activateAccountConsumerFactory(): ConsumerFactory<Int, ActivateAccountMessage> {
         val jsonDeserializer = JsonDeserializer(ActivateAccountMessage::class.java)
         return DefaultKafkaConsumerFactory(
             factoryConfig(), IntegerDeserializer(),
@@ -26,7 +27,23 @@ class KafkaConfiguration {
     @Bean
     fun accountActivationListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<Int, ActivateAccountMessage> {
         val factory = ConcurrentKafkaListenerContainerFactory<Int, ActivateAccountMessage>()
-        factory.consumerFactory = consumerFactory()
+        factory.consumerFactory = activateAccountConsumerFactory()
+        return factory
+    }
+
+    @Bean
+    fun resetPasswordConsumerFactory(): ConsumerFactory<Int, ResetPasswordMessage> {
+        val jsonDeserializer = JsonDeserializer(ResetPasswordMessage::class.java)
+        return DefaultKafkaConsumerFactory(
+            factoryConfig(), IntegerDeserializer(),
+            jsonDeserializer
+        )
+    }
+
+    @Bean
+    fun resetPasswordListenerContainerFactory(): ConcurrentKafkaListenerContainerFactory<Int, ResetPasswordMessage> {
+        val factory = ConcurrentKafkaListenerContainerFactory<Int, ResetPasswordMessage>()
+        factory.consumerFactory = resetPasswordConsumerFactory()
         return factory
     }
 
