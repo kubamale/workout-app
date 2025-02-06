@@ -39,3 +39,7 @@ jobs:
       - name: Run tests for workout-service
         run: gradle --no-daemon test
         working-directory: workout-service/
+
+      - name: Run tests for statistics-service
+        run: gradle --no-daemon test
+        working-directory: statistics-service/
