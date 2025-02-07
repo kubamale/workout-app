@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import malewicz.jakub.statistics_service.conversion.LengthUnits
 import malewicz.jakub.statistics_service.conversion.MeasurementUnitsConverter
 import malewicz.jakub.statistics_service.conversion.WeightUnits
+import malewicz.jakub.statistics_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.statistics_service.measurements.dtos.MeasurementDetails
 import malewicz.jakub.statistics_service.measurements.services.MeasurementService
 import org.junit.jupiter.api.Test
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.util.UUID
@@ -81,7 +83,15 @@ class MeasurementControllerTest(
     @Test
     fun `add measurements should return 200 when saved measurement`() {
         val userId = UUID.randomUUID()
-        `when`(measurementUnitsConverter.convertMeasurementUnits(measurementDetails, WeightUnits.KG, WeightUnits.KG, LengthUnits.CM, LengthUnits.CM)).thenReturn(measurementDetails)
+        `when`(
+            measurementUnitsConverter.convertMeasurementUnits(
+                measurementDetails,
+                WeightUnits.KG,
+                WeightUnits.KG,
+                LengthUnits.CM,
+                LengthUnits.CM
+            )
+        ).thenReturn(measurementDetails)
         mockMvc.perform(
             post("/api/v1/measurements").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(measurementDetails))
@@ -96,7 +106,15 @@ class MeasurementControllerTest(
     fun `add measurements should return 400 when passed data has negative values`() {
         val details = measurementDetails.copy(weight = -1.0)
         val userId = UUID.randomUUID()
-        `when`(measurementUnitsConverter.convertMeasurementUnits(measurementDetails, WeightUnits.KG, WeightUnits.KG, LengthUnits.CM, LengthUnits.CM)).thenReturn(measurementDetails)
+        `when`(
+            measurementUnitsConverter.convertMeasurementUnits(
+                measurementDetails,
+                WeightUnits.KG,
+                WeightUnits.KG,
+                LengthUnits.CM,
+                LengthUnits.CM
+            )
+        ).thenReturn(measurementDetails)
         mockMvc.perform(
             post("/api/v1/measurements").contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(details))
@@ -106,5 +124,43 @@ class MeasurementControllerTest(
         )
             .andExpect(status().isBadRequest)
             .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `get measurements should return 404 when no saved measurement for user`() {
+        val userId = UUID.randomUUID()
+        `when`(measurementService.getLatestMeasurement(userId)).thenThrow(ResourceNotFoundException::class.java)
+        mockMvc.perform(
+            get("/api/v1/measurements/latest")
+                .header("X-User-Id", userId)
+                .header("X-Weight-Units", WeightUnits.KG)
+                .header("X-Length-Units", LengthUnits.CM)
+        )
+            .andExpect(status().isNotFound)
+            .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `get measurements should return 200 when measurement was found`() {
+        val userId = UUID.randomUUID()
+        `when`(measurementService.getLatestMeasurement(userId)).thenReturn(measurementDetails)
+        `when`(
+            measurementUnitsConverter.convertMeasurementUnits(
+                measurementDetails,
+                WeightUnits.KG,
+                WeightUnits.KG,
+                LengthUnits.CM,
+                LengthUnits.CM
+            )
+        ).thenReturn(measurementDetails)
+        mockMvc.perform(
+            get("/api/v1/measurements/latest")
+                .header("X-User-Id", userId)
+                .header("X-Weight-Units", WeightUnits.KG)
+                .header("X-Length-Units", LengthUnits.CM)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(mapper.writeValueAsString(measurementDetails)))
     }
 }

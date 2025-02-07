@@ -36,4 +36,20 @@ class MeasurementController(
             userId
         )
     }
+
+    @GetMapping("/latest")
+    fun getLatest(
+        @RequestHeader("X-User-Id") userId: UUID,
+        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits,
+        @RequestHeader("X-Length-Units") lengthUnits: LengthUnits
+    ): MeasurementDetails {
+        val measurement = measurementService.getLatestMeasurement(userId)
+        return measurementUnitsConverter.convertMeasurementUnits(
+            measurement = measurement,
+            weightSourceUnits = WeightUnits.KG,
+            weightDestinationUnits = weightUnits,
+            lengthSourceUnits = LengthUnits.CM,
+            lengthDestinationUnits = lengthUnits
+        )
+    }
 }

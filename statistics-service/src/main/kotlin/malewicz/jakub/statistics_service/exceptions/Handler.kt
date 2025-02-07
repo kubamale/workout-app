@@ -35,4 +35,9 @@ class Handler {
         }
         return ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, errorMessage.toString().trim())
     }
+
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ResourceNotFoundException::class)
+    fun handleResourceNotFoundException(ex: ResourceNotFoundException) =
+        ErrorResponse.create(ex, HttpStatus.NOT_FOUND, ex.message)
 }
