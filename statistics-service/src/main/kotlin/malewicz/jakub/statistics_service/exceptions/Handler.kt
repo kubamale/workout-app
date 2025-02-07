@@ -6,9 +6,12 @@ import org.springframework.web.ErrorResponse
 import org.springframework.web.HttpRequestMethodNotSupportedException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.MissingRequestHeaderException
+import org.springframework.web.bind.MissingRequestValueException
+import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 
 @RestControllerAdvice
 class Handler {
@@ -18,8 +21,13 @@ class Handler {
         ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.message ?: "Method not supported.")
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MissingRequestHeaderException::class)
-    fun handleMissingRequestHeaderException(ex: MissingRequestHeaderException) =
+    @ExceptionHandler(value = [MissingRequestHeaderException::class, MissingServletRequestParameterException::class])
+    fun handleMissingRequestHeaderException(ex: MissingRequestValueException) =
+        ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.message ?: "Parameter not found.")
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    fun handleArgumentTypeMismatchException(ex: MethodArgumentTypeMismatchException) =
         ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.message)
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
