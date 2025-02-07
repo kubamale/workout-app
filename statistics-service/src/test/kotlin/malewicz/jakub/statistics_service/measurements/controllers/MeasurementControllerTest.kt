@@ -18,6 +18,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @WebMvcTest(controllers = [MeasurementController::class])
@@ -162,5 +164,61 @@ class MeasurementControllerTest(
             .andExpect(status().isOk)
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(content().json(mapper.writeValueAsString(measurementDetails)))
+    }
+
+    @Test
+    fun `get measurements since should return 400 when incorrect parameter passed`() {
+        val userId = UUID.randomUUID()
+        mockMvc.perform(
+            get("/api/v1/measurements")
+                .param("wrong", LocalDateTime.now().toString())
+                .header("X-User-Id", userId)
+                .header("X-Weight-Units", WeightUnits.KG)
+                .header("X-Length-Units", LengthUnits.CM)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `get measurements since should return 400 when passed incorrect format of date`() {
+        val userId = UUID.randomUUID()
+        mockMvc.perform(
+            get("/api/v1/measurements")
+                .param("from", LocalDate.now().toString())
+                .header("X-User-Id", userId)
+                .header("X-Weight-Units", WeightUnits.KG)
+                .header("X-Length-Units", LengthUnits.CM)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+    }
+
+    @Test
+    fun `get measurements since should return 200 when passed correct data`() {
+        val userId = UUID.randomUUID()
+        val fromDate = LocalDateTime.now()
+        `when`(measurementService.getMeasurementsSince(userId, fromDate)).thenReturn(mutableListOf(measurementDetails))
+        `when`(
+            measurementUnitsConverter.convertMeasurementUnits(
+                measurementDetails,
+                WeightUnits.KG,
+                WeightUnits.KG,
+                LengthUnits.CM,
+                LengthUnits.CM
+            )
+        ).thenReturn(measurementDetails)
+
+
+        mockMvc.perform(
+            get("/api/v1/measurements")
+                .param("from", fromDate.toString())
+                .header("X-User-Id", userId)
+                .header("X-Weight-Units", WeightUnits.KG)
+                .header("X-Length-Units", LengthUnits.CM)
+        )
+            .andExpect(status().isOk)
+            .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+            .andExpect(content().json(mapper.writeValueAsString(mutableListOf(measurementDetails))))
     }
 }

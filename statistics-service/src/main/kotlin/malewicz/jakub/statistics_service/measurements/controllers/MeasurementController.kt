@@ -8,6 +8,7 @@ import malewicz.jakub.statistics_service.measurements.dtos.MeasurementDetails
 import malewicz.jakub.statistics_service.measurements.services.MeasurementService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 import java.util.*
 
 @RestController
@@ -52,4 +53,23 @@ class MeasurementController(
             lengthDestinationUnits = lengthUnits
         )
     }
+
+    @GetMapping
+    fun getMeasurementsSince(
+        @RequestParam from: LocalDateTime, @RequestHeader("X-User-Id") userId: UUID,
+        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits,
+        @RequestHeader("X-Length-Units") lengthUnits: LengthUnits
+    ): List<MeasurementDetails> {
+        val measurements = measurementService.getMeasurementsSince(userId, from)
+        return measurements.map {
+            measurementUnitsConverter.convertMeasurementUnits(
+                measurement = it,
+                weightSourceUnits = WeightUnits.KG,
+                weightDestinationUnits = weightUnits,
+                lengthSourceUnits = LengthUnits.CM,
+                lengthDestinationUnits = lengthUnits
+            )
+        }
+    }
+
 }

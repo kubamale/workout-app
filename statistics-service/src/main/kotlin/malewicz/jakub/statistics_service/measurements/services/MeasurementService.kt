@@ -5,6 +5,7 @@ import malewicz.jakub.statistics_service.measurements.dtos.MeasurementDetails
 import malewicz.jakub.statistics_service.measurements.mappers.MeasurementMapper
 import malewicz.jakub.statistics_service.measurements.repositories.MeasurementRepository
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -23,4 +24,9 @@ class MeasurementService(
             ?: throw ResourceNotFoundException("You have no measurements yet.")
         return measurementMapper.toMeasurementDetails(measurement)
     }
+
+    fun getMeasurementsSince(userId: UUID, fromDate: LocalDateTime) =
+        measurementRepository.findAllByUserIdAndDateIsGreaterThanEqualOrderByDateDesc(userId, fromDate)
+            .map { measurementMapper.toMeasurementDetails(it) }
+
 }

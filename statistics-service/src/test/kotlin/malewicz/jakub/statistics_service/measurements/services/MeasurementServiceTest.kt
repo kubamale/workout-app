@@ -5,6 +5,7 @@ import malewicz.jakub.statistics_service.measurements.dtos.MeasurementDetails
 import malewicz.jakub.statistics_service.measurements.entities.MeasurementEntity
 import malewicz.jakub.statistics_service.measurements.mappers.MeasurementMapper
 import malewicz.jakub.statistics_service.measurements.repositories.MeasurementRepository
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -82,5 +83,24 @@ class MeasurementServiceTest {
         `when`(measurementMapper.toMeasurementDetails(measurement)).thenReturn(details)
         val result = measurementService.getLatestMeasurement(measurement.userId)
         assertEquals(details, result)
+    }
+
+    @Test
+    fun `get measurements since returns measurements`() {
+        val userId = UUID.randomUUID()
+        val fromDate = LocalDateTime.now()
+        `when`(
+            measurementRepository.findAllByUserIdAndDateIsGreaterThanEqualOrderByDateDesc(
+                userId,
+                fromDate
+            )
+        ).thenReturn(
+            mutableListOf(measurement)
+        )
+
+        `when`(measurementMapper.toMeasurementDetails(measurement)).thenReturn(details)
+        val result = measurementService.getMeasurementsSince(userId, fromDate)
+        assertThat(result).hasSize(1)
+        assertThat(result[0]).isEqualTo(details)
     }
 }
