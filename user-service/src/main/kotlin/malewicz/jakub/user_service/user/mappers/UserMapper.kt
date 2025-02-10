@@ -8,6 +8,6 @@ import org.mapstruct.Mapping
 @Mapper(componentModel = "spring")
 interface UserMapper {
 
-    @Mapping(target = "resetPasswords", ignore=true)
+    @Mapping(target = "resetPasswords", expression = "java(new java.util.ArrayList())")
     fun toUserEntity(user: RegistrationRequest): UserEntity
 }

@@ -15,6 +15,8 @@ class UserEntity(
     var dateOfBirth: LocalDate,
     @Enumerated(EnumType.ORDINAL)
     var weightUnits: WeightUnits,
+    @Enumerated(EnumType.ORDINAL)
+    var lengthUnits: LengthUnits,
     var active: Boolean = false,
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL])
     var resetPasswords: MutableList<ResetPasswordEntity> = mutableListOf(),
@@ -22,4 +24,8 @@ class UserEntity(
 
 enum class WeightUnits {
     KG, LB
+}
+
+enum class LengthUnits {
+    CM, IN
 }

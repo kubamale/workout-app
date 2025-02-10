@@ -5,6 +5,7 @@ import malewicz.jakub.user_service.authentication.dtos.RegistrationRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
 import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.notification.services.NotificationService
+import malewicz.jakub.user_service.user.entities.LengthUnits
 import malewicz.jakub.user_service.user.entities.UserEntity
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import malewicz.jakub.user_service.user.mappers.UserMapper
@@ -48,7 +49,7 @@ class AuthenticationServiceTest {
     @Test
     fun `register user should throw BadRequestException when email is already taken`() {
         val registrationRequest =
-            RegistrationRequest("user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG)
+            RegistrationRequest("user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM)
         given(userRepository.existsByEmail(registrationRequest.email)).willReturn(true)
         assertThrows<BadRequestException> { authenticationService.registerUser(registrationRequest) }
     }
@@ -56,7 +57,7 @@ class AuthenticationServiceTest {
     @Test
     fun `register user should save new user and send notification`() {
         val registrationRequest = RegistrationRequest(
-            "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
+            "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
         val user = UserEntity(
             null,
@@ -65,7 +66,8 @@ class AuthenticationServiceTest {
             registrationRequest.lastName,
             registrationRequest.password,
             registrationRequest.dateOfBirth,
-            registrationRequest.weightUnits
+            registrationRequest.weightUnits,
+            registrationRequest.lengthUnits
         )
         val savedUser = UserEntity(
             UUID.randomUUID(),
@@ -74,7 +76,8 @@ class AuthenticationServiceTest {
             registrationRequest.lastName,
             registrationRequest.password,
             registrationRequest.dateOfBirth,
-            registrationRequest.weightUnits
+            registrationRequest.weightUnits,
+            registrationRequest.lengthUnits
         )
 
         given(userRepository.existsByEmail(registrationRequest.email)).willReturn(false)
@@ -106,6 +109,7 @@ class AuthenticationServiceTest {
                 "Doe",
                 LocalDate.now(),
                 WeightUnits.KG,
+                LengthUnits.CM,
                 true
             )
         )
@@ -124,6 +128,7 @@ class AuthenticationServiceTest {
             "Doe",
             LocalDate.now(),
             WeightUnits.KG,
+            LengthUnits.CM,
             false
         )
         `when`(userRepository.findByEmail(ArgumentMatchers.anyString())).thenReturn(user)
@@ -141,6 +146,7 @@ class AuthenticationServiceTest {
             "Doe",
             LocalDate.now(),
             WeightUnits.KG,
+            LengthUnits.CM,
             true
         )
         `when`(userRepository.findByEmail(ArgumentMatchers.anyString())).thenReturn(user)
@@ -167,7 +173,8 @@ class AuthenticationServiceTest {
             "Doe",
             "Password1!",
             LocalDate.now(),
-            WeightUnits.KG
+            WeightUnits.KG,
+            LengthUnits.CM,
         )
         `when`(userRepository.findById(userId)).thenReturn(
             Optional.of(
