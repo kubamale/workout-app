@@ -5,6 +5,7 @@ import malewicz.jakub.user_service.authentication.dtos.ResetPasswordRequest
 import malewicz.jakub.user_service.exceptions.BadRequestException
 import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.user_service.notification.services.NotificationService
+import malewicz.jakub.user_service.user.entities.LengthUnits
 import malewicz.jakub.user_service.user.entities.ResetPasswordEntity
 import malewicz.jakub.user_service.user.entities.UserEntity
 import malewicz.jakub.user_service.user.entities.WeightUnits
@@ -76,6 +77,7 @@ class PasswordServiceTest {
             "Password1!",
             LocalDate.now(),
             WeightUnits.LB,
+            LengthUnits.CM,
             true
         )
         val request = ForgotPasswordRequest(user.email)
@@ -106,6 +108,7 @@ class PasswordServiceTest {
             "Password1!",
             LocalDate.now(),
             WeightUnits.LB,
+            LengthUnits.CM,
             true
         )
         val request = ResetPasswordRequest("token", "Password1!")
@@ -124,6 +127,7 @@ class PasswordServiceTest {
             "Password1!",
             LocalDate.now(),
             WeightUnits.LB,
+            LengthUnits.CM,
             true
         )
         val request = ResetPasswordRequest("token", "Password1!")

@@ -3,6 +3,7 @@ package malewicz.jakub.user_service.authentication.services
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
+import malewicz.jakub.user_service.user.entities.LengthUnits
 import malewicz.jakub.user_service.user.entities.UserEntity
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import org.assertj.core.api.Assertions.assertThat
@@ -26,7 +27,8 @@ class JwtServiceTest {
             "John",
             "Doe",
             LocalDate.now(),
-            WeightUnits.KG
+            WeightUnits.KG,
+            LengthUnits.CM,
         )
         val token = jwtService.generateToken(user)
         try {
@@ -35,6 +37,7 @@ class JwtServiceTest {
             assertThat(decodedJWT.subject).isEqualTo(user.id.toString())
             assertThat(claims["email"]!!.asString()).isEqualTo(user.email)
             assertThat(claims["weight_units"]!!.asString()).isEqualTo(user.weightUnits.toString().uppercase())
+            assertThat(claims["length_units"]!!.asString()).isEqualTo(user.lengthUnits.toString().uppercase())
             assertThat(decodedJWT.expiresAt.time).isGreaterThan(Date().time)
         } catch (e: JWTVerificationException) {
             println(e.message)

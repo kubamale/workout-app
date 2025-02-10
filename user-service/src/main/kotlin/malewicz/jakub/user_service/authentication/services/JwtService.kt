@@ -20,6 +20,7 @@ class JwtService(
         .withSubject(user.id!!.toString())
         .withClaim("email", user.email)
         .withClaim("weight_units", user.weightUnits.toString().uppercase())
+        .withClaim("length_units", user.lengthUnits.toString().uppercase())
         .withIssuedAt(Date())
         .withExpiresAt(Date(System.currentTimeMillis() + 1000 * 60 * expiration))
         .sign(algorithm)

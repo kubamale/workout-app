@@ -6,6 +6,7 @@ import malewicz.jakub.user_service.authentication.services.AuthenticationService
 import malewicz.jakub.user_service.authentication.services.PasswordService
 import malewicz.jakub.user_service.exceptions.BadRequestException
 import malewicz.jakub.user_service.exceptions.ResourceNotFoundException
+import malewicz.jakub.user_service.user.entities.LengthUnits
 import malewicz.jakub.user_service.user.entities.WeightUnits
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -64,7 +65,7 @@ class AuthenticationControllerTest(
     @Test
     fun `registerUser should return 201 when passed correct registration data`() {
         val registrationRequest = RegistrationRequest(
-            "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
+            "user@example.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
 
         mockMvc.perform(
@@ -78,7 +79,7 @@ class AuthenticationControllerTest(
     @Test
     fun `registerUser should return 400 when passed email in incorrect format`() {
         val registrationRequest = RegistrationRequest(
-            "userexample.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG
+            "userexample.com", "Password1!", "John", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
 
         mockMvc.perform(
@@ -93,7 +94,7 @@ class AuthenticationControllerTest(
     @Test
     fun `registerUser should return 400 when passed password in incorrect format`() {
         val registrationRequest = RegistrationRequest(
-            "user@example.com", "Password", "John", "Doe", LocalDate.now(), WeightUnits.KG
+            "user@example.com", "Password", "John", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
 
         mockMvc.perform(
@@ -108,7 +109,7 @@ class AuthenticationControllerTest(
     @Test
     fun `registerUser should return 400 when passed empty first name`() {
         val registrationRequest = RegistrationRequest(
-            "user@example.com", "Password", "", "Doe", LocalDate.now(), WeightUnits.KG
+            "user@example.com", "Password", "", "Doe", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
 
         mockMvc.perform(
@@ -123,7 +124,7 @@ class AuthenticationControllerTest(
     @Test
     fun `registerUser should return 400 when passed empty last name`() {
         val registrationRequest = RegistrationRequest(
-            "user@example.com", "Password", "John", "", LocalDate.now(), WeightUnits.KG
+            "user@example.com", "Password", "John", "", LocalDate.now(), WeightUnits.KG, LengthUnits.CM
         )
 
         mockMvc.perform(
