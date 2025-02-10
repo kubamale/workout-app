@@ -3,6 +3,7 @@ package malewicz.jakub.api_gateway.services
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
+import malewicz.jakub.api_gateway.models.LengthUnits
 import malewicz.jakub.api_gateway.models.UserData
 import malewicz.jakub.api_gateway.models.WeightUnits
 import org.springframework.beans.factory.annotation.Value
@@ -27,7 +28,8 @@ class JwtService(
             val id = UUID.fromString(decodedJwt.subject.toString())
             val email = decodedJwt.getClaim("email").asString()
             val weightUnits = WeightUnits.valueOf(decodedJwt.getClaim("weight_units").asString())
-            return UserData(id, email, weightUnits)
+            val lengthUnits = LengthUnits.valueOf(decodedJwt.getClaim("length_units").asString())
+            return UserData(id, email, weightUnits, lengthUnits)
         } catch (ex: JWTVerificationException ) {
             throw BadCredentialsException(ex.message, ex)
         } catch (ex: IllegalArgumentException) {

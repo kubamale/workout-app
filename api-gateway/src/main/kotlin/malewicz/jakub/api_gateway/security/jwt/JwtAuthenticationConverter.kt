@@ -23,7 +23,9 @@ class JwtAuthenticationConverter(val jwtService: JwtService) : ServerAuthenticat
     }
 
     private fun setHeadersFromUserData(userData: UserData, exchange: ServerWebExchange) {
+        exchange.request.headers.remove("X-User-Id")
         exchange.request.headers.add("X-User-Id", userData.id.toString())
         exchange.request.headers.add("X-Weight-Units", userData.weightUnits.toString())
+        exchange.request.headers.add("X-Length-Units", userData.lengthUnits.toString())
     }
 }

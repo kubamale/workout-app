@@ -2,6 +2,7 @@ package malewicz.jakub.api_gateway.services
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import malewicz.jakub.api_gateway.models.LengthUnits
 import malewicz.jakub.api_gateway.models.UserData
 import malewicz.jakub.api_gateway.models.WeightUnits
 import org.assertj.core.api.Assertions.assertThat
@@ -20,12 +21,13 @@ class JwtServiceTest {
 
     @Test
     fun `extract user data from token should return user data`() {
-        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG)
+        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG, LengthUnits.CM)
         val token = JWT.create()
             .withIssuer(jwtIssuer)
             .withSubject(userData.id.toString())
             .withClaim("email", userData.email)
             .withClaim("weight_units", userData.weightUnits.toString().uppercase())
+            .withClaim("length_units", userData.lengthUnits.toString().uppercase())
             .withIssuedAt(Date())
             .withExpiresAt(Date(System.currentTimeMillis() + 1000 * 60 * 10))
             .sign(algorithm)
@@ -35,12 +37,13 @@ class JwtServiceTest {
 
     @Test
     fun `extract user data from token should throw BadCredentialsException when incorrect user id passed`() {
-        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG)
+        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG, LengthUnits.CM)
         val token = JWT.create()
             .withIssuer(jwtIssuer)
             .withSubject("incorrect-user-id")
             .withClaim("email", userData.email)
             .withClaim("weight_units", userData.weightUnits.toString().uppercase())
+            .withClaim("length_units", userData.lengthUnits.toString().uppercase())
             .withIssuedAt(Date())
             .withExpiresAt(Date(System.currentTimeMillis() + 1000 * 60 * 10))
             .sign(algorithm)
@@ -50,12 +53,13 @@ class JwtServiceTest {
 
     @Test
     fun `extract user data from token should throw BadCredentialsException when expired token passed`() {
-        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG)
+        val userData = UserData(UUID.randomUUID(), "johndoe@ex.com", WeightUnits.KG, LengthUnits.CM)
         val token = JWT.create()
             .withIssuer(jwtIssuer)
             .withSubject(userData.id.toString())
             .withClaim("email", userData.email)
             .withClaim("weight_units", userData.weightUnits.toString().uppercase())
+            .withClaim("length_units", userData.lengthUnits.toString().uppercase())
             .withIssuedAt(Date())
             .withExpiresAt(Date(System.currentTimeMillis() - 1000 * 60 * 10))
             .sign(algorithm)
