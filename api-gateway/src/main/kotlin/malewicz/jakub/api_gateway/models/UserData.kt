@@ -6,4 +6,5 @@ data class UserData(
     val id: UUID,
     val email: String,
     val weightUnits: WeightUnits,
+    val lengthUnits: LengthUnits,
 )

@@ -20,7 +20,7 @@ class SecurityConfiguration {
 
         http.csrf{it.disable()}
             .authorizeExchange{exchange ->
-                exchange.pathMatchers("/USER-SERVICE/auth/**").permitAll()
+                exchange.pathMatchers("/USER-SERVICE/api/v1/auth/**").permitAll()
                 exchange.anyExchange().authenticated()
             }
             .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
