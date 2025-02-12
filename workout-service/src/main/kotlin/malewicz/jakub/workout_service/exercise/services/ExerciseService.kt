@@ -1,15 +1,11 @@
 package malewicz.jakub.workout_service.exercise.services
 
-import malewicz.jakub.workout_service.dtos.FilterRequest
-import malewicz.jakub.workout_service.dtos.PageableResponse
 import malewicz.jakub.workout_service.exceptions.BadRequestException
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
-import malewicz.jakub.workout_service.exercise.dtos.ExerciseBasicsResponse
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.mappers.ExerciseMapper
 import malewicz.jakub.workout_service.exercise.repositories.ExerciseRepository
-import malewicz.jakub.workout_service.exercise.repositories.ExerciseSpecification
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
@@ -21,7 +17,6 @@ import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
 import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -36,19 +31,6 @@ class ExerciseService(
         exerciseMapper.toExerciseDetails(
             exerciseRepository.findById(id).orElseThrow({ ResourceNotFoundException("No exercise found for id $id") })
         )
-
-    fun getAllExercises(pageable: Pageable, filters: List<FilterRequest>): PageableResponse<ExerciseBasicsResponse> {
-        val specification = ExerciseSpecification(filters)
-        val page = exerciseRepository.findAll(specification, pageable)
-        return PageableResponse(
-            page.totalElements,
-            page.pageable.pageNumber,
-            page.pageable.pageSize,
-            page.hasNext(),
-            page.totalPages,
-            page.content.map { exerciseMapper.toBasicResponse(it) }.toList()
-        )
-    }
 
     fun addExerciseToWorkout(exerciseRequest: ExerciseCreateRequest<*>, userId: UUID): UUID {
         val workout = workoutRepository.findByIdAndUserId(exerciseRequest.workoutId, userId)

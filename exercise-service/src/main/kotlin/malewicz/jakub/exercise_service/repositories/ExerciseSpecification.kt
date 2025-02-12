@@ -1,15 +1,15 @@
-package malewicz.jakub.workout_service.exercise.repositories
+package malewicz.jakub.exercise_service.repositories
 
 import jakarta.persistence.criteria.CriteriaBuilder
 import jakarta.persistence.criteria.CriteriaQuery
 import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
-import malewicz.jakub.workout_service.dtos.FilterRequest
-import malewicz.jakub.workout_service.exceptions.BadRequestException
-import malewicz.jakub.workout_service.exercise.entities.Equipment
-import malewicz.jakub.workout_service.exercise.entities.ExerciseEntity
-import malewicz.jakub.workout_service.exercise.entities.ExerciseType
-import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
+import malewicz.jakub.exercise_service.dtos.FilterRequest
+import malewicz.jakub.exercise_service.entities.Equipment
+import malewicz.jakub.exercise_service.entities.ExerciseEntity
+import malewicz.jakub.exercise_service.entities.ExerciseType
+import malewicz.jakub.exercise_service.entities.MuscleGroup
+import malewicz.jakub.exercise_service.exceptions.BadRequestException
 import org.springframework.data.jpa.domain.Specification
 
 class ExerciseSpecification(private val filters: List<FilterRequest>) : Specification<ExerciseEntity> {
