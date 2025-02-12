@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: exercise-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+server:
+  port: 8060
