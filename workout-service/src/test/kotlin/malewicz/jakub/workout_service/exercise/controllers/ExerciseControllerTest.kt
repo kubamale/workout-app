@@ -9,9 +9,7 @@ import malewicz.jakub.workout_service.exercise.services.ExerciseService
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
-import malewicz.jakub.workout_service.weight.WeightConverter
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.any
 import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -27,9 +25,6 @@ class ExerciseControllerTest(
     @Autowired private val mockMvc: MockMvc,
     @Autowired private val objectMapper: ObjectMapper,
 ) {
-
-  @MockitoBean private lateinit var weightConverter: WeightConverter
-
   @MockitoBean private lateinit var exerciseService: ExerciseService
 
   @Test
@@ -48,8 +43,7 @@ class ExerciseControllerTest(
             post("/api/v1/exercise/weight")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(exerciseRequest))
-                .header("X-User-Id", userId)
-                .header("X-Weight-Units", "KG"))
+                .header("X-User-Id", userId))
         .andExpect(status().isNotFound)
         .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
   }
@@ -146,32 +140,7 @@ class ExerciseControllerTest(
             post("/api/v1/exercise/weight")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(exerciseRequest))
-                .header("X-User-Id", userId)
-                .header("X-Weight-Units", "KG"))
-        .andExpect(status().isCreated)
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().json(objectMapper.writeValueAsString(exerciseId)))
-  }
-
-  @Test
-  fun `addWeightExerciseToWorkout should return 201 and convert weight to kilograms when passed correct data`() {
-    val exerciseRequest =
-        ExerciseCreateRequest(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            0,
-            mutableListOf(WeightSetCreateRequest(null, 1, 1, 1.0)))
-    val userId = UUID.randomUUID()
-    val exerciseId = UUID.randomUUID()
-    `when`(exerciseService.addExerciseToWorkout(exerciseRequest, userId)).thenReturn(exerciseId)
-    `when`(weightConverter.toKilograms(any())).thenReturn(1.0)
-    mockMvc
-        .perform(
-            post("/api/v1/exercise/weight")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(exerciseRequest))
-                .header("X-User-Id", userId)
-                .header("X-Weight-Units", "LB"))
+                .header("X-User-Id", userId))
         .andExpect(status().isCreated)
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json(objectMapper.writeValueAsString(exerciseId)))
@@ -218,30 +187,6 @@ class ExerciseControllerTest(
                 .content(objectMapper.writeValueAsString(exerciseRequest))
                 .header("X-User-Id", userId)
                 .header("X-Weight-Units", "KG"))
-        .andExpect(status().isCreated)
-        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-        .andExpect(content().json(objectMapper.writeValueAsString(exerciseId)))
-  }
-
-  @Test
-  fun `addTimeExerciseToWorkout should return 201 and converts weight to kilograms when passed correct data`() {
-    val exerciseRequest =
-        ExerciseCreateRequest(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            0,
-            mutableListOf(TimeSetCreateRequest(null, 1, 10, 0.0)))
-    val userId = UUID.randomUUID()
-    val exerciseId = UUID.randomUUID()
-    `when`(exerciseService.addExerciseToWorkout(exerciseRequest, userId)).thenReturn(exerciseId)
-    `when`(weightConverter.toKilograms(any())).thenReturn(0.0)
-    mockMvc
-        .perform(
-            post("/api/v1/exercise/time")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(exerciseRequest))
-                .header("X-User-Id", userId)
-                .header("X-Weight-Units", "LB"))
         .andExpect(status().isCreated)
         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
         .andExpect(content().json(objectMapper.writeValueAsString(exerciseId)))
