@@ -1,75 +1,33 @@
 package malewicz.jakub.statistics_service.measurements.controllers
 
 import jakarta.validation.Valid
-import malewicz.jakub.statistics_service.conversion.LengthUnits
-import malewicz.jakub.statistics_service.conversion.MeasurementUnitsConverter
-import malewicz.jakub.statistics_service.conversion.WeightUnits
+import java.time.LocalDateTime
+import java.util.*
 import malewicz.jakub.statistics_service.measurements.dtos.MeasurementDetails
 import malewicz.jakub.statistics_service.measurements.services.MeasurementService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
-import java.time.LocalDateTime
-import java.util.*
 
 @RestController
 @RequestMapping("/api/v1/measurements")
-class MeasurementController(
-    private val measurementService: MeasurementService,
-    private val measurementUnitsConverter: MeasurementUnitsConverter
-) {
+class MeasurementController(private val measurementService: MeasurementService) {
 
-    @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping
-    fun addMeasurement(
-        @Valid @RequestBody measurement: MeasurementDetails,
-        @RequestHeader("X-User-Id") userId: UUID,
-        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits,
-        @RequestHeader("X-Length-Units") lengthUnits: LengthUnits,
-    ) {
-        measurementService.add(
-            measurementUnitsConverter.convertMeasurementUnits(
-                measurement = measurement,
-                weightSourceUnits = weightUnits,
-                weightDestinationUnits = WeightUnits.KG,
-                lengthSourceUnits = lengthUnits,
-                lengthDestinationUnits = LengthUnits.CM
-            ),
-            userId
-        )
-    }
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping
+  fun addMeasurement(
+      @Valid @RequestBody measurement: MeasurementDetails,
+      @RequestHeader("X-User-Id") userId: UUID
+  ) {
+    measurementService.add(measurement, userId)
+  }
 
-    @GetMapping("/latest")
-    fun getLatest(
-        @RequestHeader("X-User-Id") userId: UUID,
-        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits,
-        @RequestHeader("X-Length-Units") lengthUnits: LengthUnits
-    ): MeasurementDetails {
-        val measurement = measurementService.getLatestMeasurement(userId)
-        return measurementUnitsConverter.convertMeasurementUnits(
-            measurement = measurement,
-            weightSourceUnits = WeightUnits.KG,
-            weightDestinationUnits = weightUnits,
-            lengthSourceUnits = LengthUnits.CM,
-            lengthDestinationUnits = lengthUnits
-        )
-    }
+  @GetMapping("/latest")
+  fun getLatest(@RequestHeader("X-User-Id") userId: UUID) =
+      measurementService.getLatestMeasurement(userId)
 
-    @GetMapping
-    fun getMeasurementsSince(
-        @RequestParam from: LocalDateTime, @RequestHeader("X-User-Id") userId: UUID,
-        @RequestHeader("X-Weight-Units") weightUnits: WeightUnits,
-        @RequestHeader("X-Length-Units") lengthUnits: LengthUnits
-    ): List<MeasurementDetails> {
-        val measurements = measurementService.getMeasurementsSince(userId, from)
-        return measurements.map {
-            measurementUnitsConverter.convertMeasurementUnits(
-                measurement = it,
-                weightSourceUnits = WeightUnits.KG,
-                weightDestinationUnits = weightUnits,
-                lengthSourceUnits = LengthUnits.CM,
-                lengthDestinationUnits = lengthUnits
-            )
-        }
-    }
-
+  @GetMapping
+  fun getMeasurementsSince(
+      @RequestParam from: LocalDateTime,
+      @RequestHeader("X-User-Id") userId: UUID
+  ) = measurementService.getMeasurementsSince(userId, from)
 }
