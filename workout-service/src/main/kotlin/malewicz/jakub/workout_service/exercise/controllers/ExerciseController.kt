@@ -1,9 +1,6 @@
 package malewicz.jakub.workout_service.exercise.controllers
 
 import jakarta.validation.Valid
-import malewicz.jakub.workout_service.dtos.FilterRequest
-import malewicz.jakub.workout_service.dtos.PageableResponse
-import malewicz.jakub.workout_service.exercise.dtos.ExerciseBasicsResponse
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.exercise.services.ExerciseService
@@ -12,7 +9,6 @@ import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
 import malewicz.jakub.workout_service.weight.WeightConverter
 import malewicz.jakub.workout_service.weight.WeightUnits
-import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -26,16 +22,6 @@ class ExerciseController(
 
     @GetMapping("/{id}")
     fun getDetails(@PathVariable id: UUID) = exerciseService.getExerciseDetails(id)
-
-    @PostMapping
-    fun getAllExercises(
-        @RequestParam size: Int,
-        @RequestParam page: Int,
-        @RequestBody filters: List<FilterRequest>
-    ): PageableResponse<ExerciseBasicsResponse> {
-        val pageRequest = PageRequest.of(page, size)
-        return exerciseService.getAllExercises(pageRequest, filters)
-    }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/weight")

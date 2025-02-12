@@ -1,4 +1,4 @@
-package malewicz.jakub.workout_service.dtos
+package malewicz.jakub.exercise_service.dtos
 
 data class FilterRequest(
     val value: Any,

@@ -1,6 +1,5 @@
 package malewicz.jakub.workout_service.exercise.services
 
-import malewicz.jakub.workout_service.dtos.FilterRequest
 import malewicz.jakub.workout_service.exceptions.BadRequestException
 import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
@@ -24,13 +23,11 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.ArgumentMatchers
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito.*
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.mockito.junit.jupiter.MockitoExtension
-import org.springframework.data.domain.PageImpl
-import org.springframework.data.domain.PageRequest
 import java.util.*
 
 @ExtendWith(MockitoExtension::class)
@@ -241,32 +238,6 @@ class ExerciseServiceTest {
         )
         assertThat(exerciseService.addExerciseToWorkout(exerciseRequest, userId)).isEqualTo(exerciseId)
         verify(workoutRepository).save(workout)
-    }
-
-    @Test
-    fun `get all exercises should return pageable response`() {
-        val page = PageRequest.of(0, 10)
-        val filter = FilterRequest(ExerciseType.STRENGTH, "type")
-        val exercise = ExerciseEntity(
-            UUID.randomUUID(),
-            "curls",
-            MuscleGroup.BICEPS,
-            "description",
-            ExerciseType.STRENGTH,
-            Equipment.DUMBBELL
-        )
-        `when`(exerciseRepository.findAll(any(), ArgumentMatchers.eq(page))).thenReturn(
-            PageImpl(
-                listOf(exercise),
-                page,
-                5
-            )
-        )
-        val result = exerciseService.getAllExercises(page, listOf(filter))
-        assertThat(result.results).hasSize(1)
-        assertThat(result.totalElements).isEqualTo(1)
-        assertThat(result.totalPages).isEqualTo(1)
-        assertThat(result.hasNextPage).isFalse()
     }
 
     @Test
