@@ -1,9 +1,9 @@
 package malewicz.jakub.workout_service.exercise.dtos
 
-import malewicz.jakub.workout_service.exercise.entities.Equipment
-import malewicz.jakub.workout_service.exercise.entities.ExerciseType
-import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
 import java.util.*
+import malewicz.jakub.workout_service.exercise.models.Equipment
+import malewicz.jakub.workout_service.exercise.models.ExerciseType
+import malewicz.jakub.workout_service.exercise.models.MuscleGroup
 
 data class ExerciseDetails(
     var id: UUID,

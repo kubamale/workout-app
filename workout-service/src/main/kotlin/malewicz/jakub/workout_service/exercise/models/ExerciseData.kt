@@ -1,0 +1,47 @@
+package malewicz.jakub.workout_service.exercise.models
+
+enum class MuscleGroup {
+  ABDOMINALS,
+  ADDUCTORS,
+  ABDUCTORS,
+  BICEPS,
+  CALVES,
+  CHEST,
+  FOREARMS,
+  GLUTES,
+  HAMSTRINGS,
+  LATS,
+  LOWER_BACK,
+  MIDDLE_BACK,
+  TRAPS,
+  NECK,
+  QUADRICEPS,
+  SHOULDERS,
+  TRICEPS
+}
+
+enum class ExerciseType {
+  STRENGTH,
+  PLYOMETRICS,
+  CARDIO,
+  STRETCHING,
+  POWERLIFTING,
+  STRONGMAN,
+  OLYMPIC_WEIGHTLIFTING
+}
+
+enum class Equipment {
+  BANDS,
+  BARBELL,
+  KETTLEBELLS,
+  DUMBBELL,
+  OTHER,
+  CABLE,
+  MACHINE,
+  BODY_ONLY,
+  MEDICINE_BALL,
+  NONE,
+  EXERCISE_BALL,
+  FOAM_ROLL,
+  EZ_CURL_BAR
+}
