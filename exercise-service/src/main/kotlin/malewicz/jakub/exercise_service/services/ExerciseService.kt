@@ -13,27 +13,33 @@ import org.springframework.stereotype.Service
 
 @Service
 class ExerciseService(
-    private val exerciseRepository: ExerciseRepository,
-    private val exerciseMapper: ExerciseMapper
+  private val exerciseRepository: ExerciseRepository,
+  private val exerciseMapper: ExerciseMapper
 ) {
   fun getAllExercises(
-      pageRequest: PageRequest,
-      filters: List<FilterRequest>
+    pageRequest: PageRequest,
+    filters: List<FilterRequest>
   ): PageableResponse<ExerciseBasicsResponse> {
     val specification = ExerciseSpecification(filters)
     val page = exerciseRepository.findAll(specification, pageRequest)
     return PageableResponse(
-        page.totalElements,
-        page.number,
-        page.size,
-        page.hasNext(),
-        page.totalPages,
-        page.content.map { exerciseMapper.toExerciseBasicResponse(it) })
+      page.totalElements,
+      page.number,
+      page.size,
+      page.hasNext(),
+      page.totalPages,
+      page.content.map { exerciseMapper.toExerciseBasicResponse(it) })
   }
 
   fun getDetails(id: UUID) =
-      exerciseRepository
-          .findById(id)
-          .orElseThrow { ResourceNotFoundException("No exercise found with id $id") }
-          .let { exerciseMapper.toExerciseDetails(it) }
+    exerciseRepository
+      .findById(id)
+      .orElseThrow { ResourceNotFoundException("No exercise found with id $id") }
+      .let { exerciseMapper.toExerciseDetails(it) }
+
+  fun getAllByIds(ids: List<UUID>) =
+    exerciseRepository
+      .findAllById(ids)
+      .map { exerciseMapper.toExerciseDetails(it) }
+      .toList()
 }

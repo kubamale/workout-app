@@ -15,9 +15,9 @@ class ExerciseController(private val exerciseService: ExerciseService) {
 
   @PostMapping
   fun getAllExercises(
-      @RequestParam size: Int,
-      @RequestParam page: Int,
-      @RequestBody filters: List<FilterRequest>
+    @RequestParam size: Int,
+    @RequestParam page: Int,
+    @RequestBody filters: List<FilterRequest>
   ): PageableResponse<ExerciseBasicsResponse> {
     val pageRequest = PageRequest.of(page, size)
     return exerciseService.getAllExercises(pageRequest, filters)
@@ -25,4 +25,7 @@ class ExerciseController(private val exerciseService: ExerciseService) {
 
   @GetMapping("/{id}")
   fun getExerciseDetails(@PathVariable id: UUID): ExerciseDetails = exerciseService.getDetails(id)
+
+  @GetMapping
+  fun getExercises(@RequestBody ids: List<UUID>): List<ExerciseDetails> = exerciseService.getAllByIds(ids)
 }

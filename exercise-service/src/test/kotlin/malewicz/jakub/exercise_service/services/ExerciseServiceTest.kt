@@ -27,29 +27,32 @@ import org.springframework.data.domain.PageRequest
 @ExtendWith(MockitoExtension::class)
 class ExerciseServiceTest {
 
-  @Mock private lateinit var exerciseRepository: ExerciseRepository
+  @Mock
+  private lateinit var exerciseRepository: ExerciseRepository
 
-  @Mock private lateinit var exerciseMapper: ExerciseMapper
+  @Mock
+  private lateinit var exerciseMapper: ExerciseMapper
 
-  @InjectMocks private lateinit var exerciseService: ExerciseService
+  @InjectMocks
+  private lateinit var exerciseService: ExerciseService
 
   @Test
   fun `get all exercises should return pageable response`() {
     val page = PageRequest.of(0, 10)
     val filter = FilterRequest(ExerciseType.STRENGTH, "type")
     val exercise =
-        ExerciseEntity(
-            UUID.randomUUID(),
-            "curls",
-            MuscleGroup.BICEPS,
-            "description",
-            ExerciseType.STRENGTH,
-            Equipment.DUMBBELL,
-        )
+      ExerciseEntity(
+        UUID.randomUUID(),
+        "curls",
+        MuscleGroup.BICEPS,
+        "description",
+        ExerciseType.STRENGTH,
+        Equipment.DUMBBELL,
+      )
     `when`(exerciseRepository.findAll(any(), ArgumentMatchers.eq(page)))
-        .thenReturn(PageImpl(listOf(exercise), page, 5))
+      .thenReturn(PageImpl(listOf(exercise), page, 5))
     `when`(exerciseMapper.toExerciseBasicResponse(exercise))
-        .thenReturn(ExerciseBasicsResponse(exercise.id!!, exercise.name, exercise.pictureURL))
+      .thenReturn(ExerciseBasicsResponse(exercise.id!!, exercise.name, exercise.pictureURL))
     val result = exerciseService.getAllExercises(page, listOf(filter))
     assertThat(result.results).hasSize(1)
     assertThat(result.totalElements).isEqualTo(1)
@@ -68,26 +71,63 @@ class ExerciseServiceTest {
   fun `get details should throw return exercise details`() {
     val id = UUID.randomUUID()
     val exercise =
-        ExerciseEntity(
-            UUID.randomUUID(),
-            "curls",
-            MuscleGroup.BICEPS,
-            "description",
-            ExerciseType.STRENGTH,
-            Equipment.DUMBBELL,
-        )
+      ExerciseEntity(
+        UUID.randomUUID(),
+        "curls",
+        MuscleGroup.BICEPS,
+        "description",
+        ExerciseType.STRENGTH,
+        Equipment.DUMBBELL,
+      )
     val exerciseDetails =
-        ExerciseDetails(
-            id,
-            "Legs",
-            MuscleGroup.LATS,
-            "desc",
-            ExerciseType.STRETCHING,
-            Equipment.NONE,
-        )
+      ExerciseDetails(
+        id,
+        "Legs",
+        MuscleGroup.LATS,
+        "desc",
+        ExerciseType.STRETCHING,
+        Equipment.NONE,
+      )
     `when`(exerciseRepository.findById(id)).thenReturn(Optional.of(exercise))
     `when`(exerciseMapper.toExerciseDetails(exercise)).thenReturn(exerciseDetails)
     val result = exerciseService.getDetails(id)
     assertThat(result.id).isEqualTo(exerciseDetails.id)
+  }
+
+  @Test
+  fun `get all exercises by Id should return list of exercises`() {
+    val exercise1 =
+      ExerciseEntity(
+        UUID.randomUUID(),
+        "curls",
+        MuscleGroup.BICEPS,
+        "description",
+        ExerciseType.STRENGTH,
+        Equipment.DUMBBELL,
+      )
+    val exercise2 =
+      ExerciseEntity(
+        UUID.randomUUID(),
+        "curls",
+        MuscleGroup.BICEPS,
+        "description",
+        ExerciseType.STRENGTH,
+        Equipment.DUMBBELL,
+      )
+    val exerciseDetails =
+      ExerciseDetails(
+        exercise1.id!!,
+        "Legs",
+        MuscleGroup.LATS,
+        "desc",
+        ExerciseType.STRETCHING,
+        Equipment.NONE,
+      )
+    val ids = listOf(exercise1.id!!, exercise2.id!!)
+    `when`(exerciseRepository.findAllById(ids)).thenReturn(listOf(exercise1, exercise2))
+    `when`(exerciseMapper.toExerciseDetails(exercise1)).thenReturn(exerciseDetails)
+    `when`(exerciseMapper.toExerciseDetails(exercise2)).thenReturn(exerciseDetails)
+    val result = exerciseService.getAllByIds(ids)
+    assertThat(result.size).isEqualTo(2)
   }
 }
