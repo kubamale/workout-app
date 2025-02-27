@@ -3,10 +3,10 @@ package malewicz.jakub.exercise_service.services
 import malewicz.jakub.exercise_service.dtos.ExerciseBasicsResponse
 import malewicz.jakub.exercise_service.dtos.FilterRequest
 import malewicz.jakub.exercise_service.dtos.PageableResponse
+import malewicz.jakub.exercise_service.entities.ExerciseEntity
 import malewicz.jakub.exercise_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.exercise_service.mappers.ExerciseMapper
 import malewicz.jakub.exercise_service.repositories.ExerciseRepository
-import malewicz.jakub.exercise_service.repositories.ExerciseSpecification
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.util.*
@@ -14,13 +14,14 @@ import java.util.*
 @Service
 class ExerciseService(
   private val exerciseRepository: ExerciseRepository,
-  private val exerciseMapper: ExerciseMapper
+  private val exerciseMapper: ExerciseMapper,
+  private val exerciseFilterService: FilterService<ExerciseEntity>
 ) {
   fun getAllExercises(
     pageRequest: PageRequest,
     filters: List<FilterRequest>
   ): PageableResponse<ExerciseBasicsResponse> {
-    val specification = ExerciseSpecification(filters)
+    val specification = exerciseFilterService.getSpecificationFromFilters(filters)
     val page = exerciseRepository.findAll(specification, pageRequest)
     return PageableResponse(
       page.totalElements,

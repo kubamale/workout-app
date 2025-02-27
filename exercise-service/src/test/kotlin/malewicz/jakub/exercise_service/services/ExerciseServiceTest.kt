@@ -33,6 +33,9 @@ class ExerciseServiceTest {
   @Mock
   private lateinit var exerciseMapper: ExerciseMapper
 
+  @Mock
+  private lateinit var exerciseFilterService: FilterService<ExerciseEntity>
+
   @InjectMocks
   private lateinit var exerciseService: ExerciseService
 
@@ -49,6 +52,11 @@ class ExerciseServiceTest {
         ExerciseType.STRENGTH,
         Equipment.DUMBBELL,
       )
+    `when`(exerciseFilterService.getSpecificationFromFilters(listOf(filter))).thenReturn(
+      ExerciseRepository.byType(
+        ExerciseType.STRENGTH
+      )
+    )
     `when`(exerciseRepository.findAll(any(), ArgumentMatchers.eq(page)))
       .thenReturn(PageImpl(listOf(exercise), page, 5))
     `when`(exerciseMapper.toExerciseBasicResponse(exercise))
