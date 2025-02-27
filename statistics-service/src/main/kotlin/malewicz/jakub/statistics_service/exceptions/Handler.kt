@@ -1,6 +1,8 @@
 package malewicz.jakub.statistics_service.exceptions
 
 import org.springframework.http.HttpStatus
+import org.springframework.http.ProblemDetail
+import org.springframework.http.ResponseEntity
 import org.springframework.validation.FieldError
 import org.springframework.web.ErrorResponse
 import org.springframework.web.HttpRequestMethodNotSupportedException
@@ -53,4 +55,8 @@ class Handler {
     @ExceptionHandler(ResourceNotFoundException::class)
     fun handleResourceNotFoundException(ex: ResourceNotFoundException) =
         ErrorResponse.create(ex, HttpStatus.NOT_FOUND, ex.message)
+
+    @ExceptionHandler
+    fun handleHttpException(ex: HttpException): ResponseEntity<ProblemDetail> =
+        ResponseEntity(ErrorResponse.create(ex, ex.status, ex.message).body, ex.status)
 }
