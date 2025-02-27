@@ -1,6 +1,5 @@
 package malewicz.jakub.exercise_service.services
 
-import java.util.*
 import malewicz.jakub.exercise_service.dtos.ExerciseBasicsResponse
 import malewicz.jakub.exercise_service.dtos.FilterRequest
 import malewicz.jakub.exercise_service.dtos.PageableResponse
@@ -10,6 +9,7 @@ import malewicz.jakub.exercise_service.repositories.ExerciseRepository
 import malewicz.jakub.exercise_service.repositories.ExerciseSpecification
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class ExerciseService(
@@ -39,7 +39,7 @@ class ExerciseService(
 
   fun getAllByIds(ids: List<UUID>) =
     exerciseRepository
-      .findAllById(ids)
+      .findAllByIdIn(ids)
       .map { exerciseMapper.toExerciseDetails(it) }
       .toList()
 }

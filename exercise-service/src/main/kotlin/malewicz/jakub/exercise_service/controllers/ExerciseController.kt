@@ -27,5 +27,5 @@ class ExerciseController(private val exerciseService: ExerciseService) {
   fun getExerciseDetails(@PathVariable id: UUID): ExerciseDetails = exerciseService.getDetails(id)
 
   @GetMapping
-  fun getExercises(@RequestBody ids: List<UUID>): List<ExerciseDetails> = exerciseService.getAllByIds(ids)
+  fun getExercises(@RequestParam ids: List<UUID>): List<ExerciseDetails> = exerciseService.getAllByIds(ids)
 }
