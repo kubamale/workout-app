@@ -57,11 +57,11 @@ class WorkoutServiceTest {
   }
 
   @Test
-  fun `get days since last workout should return 0 when no workouts were found`() {
+  fun `get days since last workout should return null when no workouts were found`() {
     val userId = UUID.randomUUID()
     `when`(workoutRepository.getLatestWorkoutDate(userId)).thenReturn(null)
     val days = workoutService.getDaysSinceLastWorkout(userId)
-    assertEquals(0, days)
+    assertEquals(null, days)
   }
 
   @Test

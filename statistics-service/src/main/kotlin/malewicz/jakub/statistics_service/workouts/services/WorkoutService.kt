@@ -23,7 +23,7 @@ class WorkoutService(
   }
 
   fun getDaysSinceLastWorkout(userId: UUID) =
-    workoutRepository.getLatestWorkoutDate(userId)?.let { ChronoUnit.DAYS.between(it, LocalDateTime.now()) } ?: 0
+    workoutRepository.getLatestWorkoutDate(userId)?.let { ChronoUnit.DAYS.between(it, LocalDateTime.now()) }
 
   fun getWorkoutsFromCurrentWeek(userId: UUID): List<WorkoutBasicInfo> {
     val today = LocalDate.now()
