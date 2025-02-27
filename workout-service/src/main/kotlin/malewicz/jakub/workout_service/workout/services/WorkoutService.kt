@@ -43,4 +43,7 @@ class WorkoutService(
         .toMutableList()
     return workoutMapper.toWorkoutDetailsResponse(workout, workoutExerciseDetails)
   }
+
+  fun getByIds(ids: List<UUID>) =
+    workoutRepository.findAllByIdIn(ids).map { workoutMapper.toWorkoutResponse(it) }.toList()
 }
