@@ -124,7 +124,7 @@ class ExerciseServiceTest {
         Equipment.NONE,
       )
     val ids = listOf(exercise1.id!!, exercise2.id!!)
-    `when`(exerciseRepository.findAllById(ids)).thenReturn(listOf(exercise1, exercise2))
+    `when`(exerciseRepository.findAllByIdIn(ids)).thenReturn(listOf(exercise1, exercise2))
     `when`(exerciseMapper.toExerciseDetails(exercise1)).thenReturn(exerciseDetails)
     `when`(exerciseMapper.toExerciseDetails(exercise2)).thenReturn(exerciseDetails)
     val result = exerciseService.getAllByIds(ids)

@@ -9,6 +9,12 @@ spring:
   h2:
     console:
       enabled: true
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            errorDecoder: malewicz.jakub.workout_service.clients.FeignErrorDecoder
 
 eureka:
   client:

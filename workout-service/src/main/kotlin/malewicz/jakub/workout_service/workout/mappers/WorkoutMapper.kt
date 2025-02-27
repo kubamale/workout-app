@@ -22,10 +22,11 @@ interface WorkoutMapper {
       workoutExerciseDetails: MutableList<WorkoutExerciseDetails> = mutableListOf()
   ): WorkoutDetailsResponse
 
-  @Mapping(target = "exercise", ignore = true)
-  @Mapping(target = "order", source = "exerciseOrder")
+  @Mapping(target = "exercise", source = "exerciseDetails")
+  @Mapping(target = "order", source = "workoutExercise.exerciseOrder")
+  @Mapping(target = "id", source = "workoutExercise.id")
   fun toWorkoutExerciseDetails(
       workoutExercise: WorkoutExerciseEntity,
-      exerciseDetails: ExerciseDetails
+      exerciseDetails: ExerciseDetails?
   ): WorkoutExerciseDetails
 }

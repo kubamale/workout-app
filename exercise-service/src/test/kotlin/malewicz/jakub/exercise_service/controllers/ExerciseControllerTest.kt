@@ -111,7 +111,7 @@ class ExerciseControllerTest(
     `when`(exerciseService.getAllByIds(ids)).thenReturn(listOf(exercise1, exercise2))
 
     mockMvc.perform(
-      get("/api/v1/exercises").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(ids))
+      get("/api/v1/exercises").param("ids", ids.joinToString(","))
     )
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))

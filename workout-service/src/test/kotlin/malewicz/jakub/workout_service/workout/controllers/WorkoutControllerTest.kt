@@ -3,9 +3,9 @@ package malewicz.jakub.workout_service.workout.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseDetails
-import malewicz.jakub.workout_service.exercise.entities.Equipment
-import malewicz.jakub.workout_service.exercise.entities.ExerciseType
-import malewicz.jakub.workout_service.exercise.entities.MuscleGroup
+import malewicz.jakub.workout_service.exercise.models.Equipment
+import malewicz.jakub.workout_service.exercise.models.ExerciseType
+import malewicz.jakub.workout_service.exercise.models.MuscleGroup
 import malewicz.jakub.workout_service.set.dtos.SetDetailsDto
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
