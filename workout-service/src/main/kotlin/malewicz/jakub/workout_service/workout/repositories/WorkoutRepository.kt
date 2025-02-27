@@ -10,4 +10,5 @@ interface WorkoutRepository : JpaRepository<WorkoutEntity, UUID> {
     @EntityGraph(attributePaths = ["workoutExercises"])
     fun findByIdAndUserId(id: UUID, userId: UUID): Optional<WorkoutEntity>
     fun findByUserId(userId: UUID): List<WorkoutEntity>
+    fun findAllByIdIn(id: Collection<UUID>): List<WorkoutEntity>
 }
