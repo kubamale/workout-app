@@ -8,14 +8,14 @@ import malewicz.jakub.workout_service.exercise.models.ExerciseType
 import malewicz.jakub.workout_service.exercise.models.MuscleGroup
 import malewicz.jakub.workout_service.set.dtos.SetDetailsDto
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
+import malewicz.jakub.workout_service.set.repositories.SetRepository
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
 import malewicz.jakub.workout_service.workout.dtos.WorkoutExerciseDetails
 import malewicz.jakub.workout_service.workout.dtos.WorkoutResponse
+import malewicz.jakub.workout_service.workout.entities.WeightWorkoutExerciseEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
-import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
 import malewicz.jakub.workout_service.workout.mappers.WorkoutMapper
-import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -39,7 +39,7 @@ class WorkoutServiceTest {
   private lateinit var workoutMapper: WorkoutMapper
 
   @Mock
-  private lateinit var workoutExerciseRepository: WorkoutExerciseRepository
+  private lateinit var setRepository: SetRepository
 
   @Mock
   private lateinit var exerciseClient: ExerciseClient
@@ -96,13 +96,14 @@ class WorkoutServiceTest {
     val userId = UUID.randomUUID()
     val workout = WorkoutEntity(workoutId, "push", userId)
     val set = WeightSetEntity(UUID.randomUUID(), 0, null, 10, 20.0)
-    val workoutExercise = WorkoutExerciseEntity(
+    val workoutExercise = WeightWorkoutExerciseEntity(
       UUID.randomUUID(),
       workout,
       UUID.randomUUID(),
-      mutableListOf(set),
-      0
+      0,
+      mutableListOf(set)
     )
+    set.workoutExercise = workoutExercise
     val exerciseDetails = ExerciseDetails(
       workoutExercise.exerciseId,
       "legs",
@@ -111,9 +112,9 @@ class WorkoutServiceTest {
       ExerciseType.CARDIO,
       Equipment.NONE
     )
-
+    workout.workoutExercises = mutableListOf(workoutExercise)
     `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
-    `when`(workoutExerciseRepository.findByWorkoutId(workoutId)).thenReturn(listOf(workoutExercise))
+    `when`(setRepository.findAllByWorkoutExerciseIn(workout.workoutExercises)).thenReturn(listOf(set))
     `when`(exerciseClient.getExercisesDetails(listOf(workoutExercise.exerciseId))).thenReturn(
       listOf(
         exerciseDetails
@@ -124,7 +125,9 @@ class WorkoutServiceTest {
         SetDetailsDto(set.id!!, set.setOrder, set.reps, set.weight)
       )
     )
-    `when`(workoutMapper.toWorkoutExerciseDetails(workoutExercise, exerciseDetails)).thenReturn(workoutExerciseDetails)
+    `when`(workoutMapper.toWorkoutExerciseDetails(workoutExercise, exerciseDetails, mutableListOf(set))).thenReturn(
+      workoutExerciseDetails
+    )
     `when`(workoutMapper.toWorkoutDetailsResponse(workout, mutableListOf(workoutExerciseDetails))).thenReturn(
       WorkoutDetailsResponse(
         workoutId,

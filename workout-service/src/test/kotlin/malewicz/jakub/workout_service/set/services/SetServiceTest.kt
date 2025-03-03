@@ -8,6 +8,7 @@ import malewicz.jakub.workout_service.set.entities.DistanceSetEntity
 import malewicz.jakub.workout_service.set.entities.TimeSetEntity
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
 import malewicz.jakub.workout_service.set.repositories.SetRepository
+import malewicz.jakub.workout_service.workout.entities.WeightWorkoutExerciseEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
 import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
 import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
@@ -44,7 +45,7 @@ class SetServiceTest {
 
   @Test
   fun `update sets should throw BadRequestException when weight not set in WeightSet`() {
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     val set = WeightSetEntity(UUID.randomUUID(), 0, workoutExercise, 10, 10.0)
     `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
     `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(mutableListOf(set))
@@ -54,7 +55,7 @@ class SetServiceTest {
 
   @Test
   fun `update sets should throw BadRequestException when reps not set in WeightSet`() {
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     val set = WeightSetEntity(UUID.randomUUID(), 0, workoutExercise, 10, 10.0)
     `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
     `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(mutableListOf(set))
@@ -64,7 +65,7 @@ class SetServiceTest {
 
   @Test
   fun `update weight sets should return unit when passed correct data`() {
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     val existingSet = WeightSetEntity(UUID.randomUUID(), 0, workoutExercise, 10, 10.0)
     `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
     `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(mutableListOf(existingSet))
@@ -75,7 +76,7 @@ class SetServiceTest {
 
   @Test
   fun `update time sets should return unit when passed correct data`() {
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     val existingSet = TimeSetEntity(UUID.randomUUID(), 0, workoutExercise, 10, 10.0)
     `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
     `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(mutableListOf(existingSet))
@@ -86,7 +87,7 @@ class SetServiceTest {
 
   @Test
   fun `update distance sets should return unit when passed correct data`() {
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     val existingSet = DistanceSetEntity(UUID.randomUUID(), 0, workoutExercise, 10.0)
     `when`(workoutExerciseRepository.findById(workoutExercise.id!!)).thenReturn(Optional.of(workoutExercise))
     `when`(setRepository.findAllByWorkoutExerciseId(workoutExercise.id!!)).thenReturn(mutableListOf(existingSet))

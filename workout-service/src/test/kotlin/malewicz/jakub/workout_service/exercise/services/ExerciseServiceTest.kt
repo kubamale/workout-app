@@ -6,10 +6,10 @@ import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
+import malewicz.jakub.workout_service.set.dtos.SetType
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
-import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
-import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
+import malewicz.jakub.workout_service.workout.entities.*
 import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -39,7 +39,7 @@ class ExerciseServiceTest {
     val userId = UUID.randomUUID()
     val exerciseRequest =
       ExerciseCreateRequest<WeightSetCreateRequest>(
-        UUID.randomUUID(), UUID.randomUUID(), 0, mutableListOf()
+        UUID.randomUUID(), UUID.randomUUID(), SetType.WEIGHT, 0, mutableListOf()
       )
     `when`(workoutRepository.findByIdAndUserId(exerciseRequest.workoutId, userId))
       .thenReturn(Optional.empty())
@@ -55,6 +55,7 @@ class ExerciseServiceTest {
       ExerciseCreateRequest(
         UUID.randomUUID(),
         UUID.randomUUID(),
+        SetType.WEIGHT,
         0,
         mutableListOf(WeightSetCreateRequest(null, 0, 10, 23.5)),
       )
@@ -69,7 +70,7 @@ class ExerciseServiceTest {
           "Push",
           userId,
           mutableListOf(
-            WorkoutExerciseEntity(workoutExerciseId, workout, UUID.randomUUID(), mutableListOf(), 0)
+            WeightWorkoutExerciseEntity(workoutExerciseId, workout, UUID.randomUUID(), 0, mutableListOf())
           ),
         ),
       )
@@ -84,6 +85,7 @@ class ExerciseServiceTest {
       ExerciseCreateRequest(
         UUID.randomUUID(),
         UUID.randomUUID(),
+        SetType.TIME,
         1,
         mutableListOf(TimeSetCreateRequest(null, 0, 10, 0.0)),
       )
@@ -92,9 +94,9 @@ class ExerciseServiceTest {
 
     workout.workoutExercises =
       mutableListOf(
-        WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0),
-        WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 1),
-        WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 2),
+        WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf()),
+        WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 1, mutableListOf()),
+        WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 2, mutableListOf()),
       )
 
     val workoutExerciseId = UUID.randomUUID()
@@ -109,10 +111,10 @@ class ExerciseServiceTest {
           "Push",
           userId,
           mutableListOf(
-            WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0),
-            WorkoutExerciseEntity(workoutExerciseId, workout, exerciseId, mutableListOf(), 1),
-            WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 2),
-            WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 3),
+            TimeWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf()),
+            TimeWorkoutExerciseEntity(workoutExerciseId, workout, exerciseId, 1, mutableListOf()),
+            TimeWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 2, mutableListOf()),
+            TimeWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 3, mutableListOf()),
           ),
         ),
       )
@@ -127,6 +129,7 @@ class ExerciseServiceTest {
       ExerciseCreateRequest(
         UUID.randomUUID(),
         UUID.randomUUID(),
+        SetType.DISTANCE,
         2,
         mutableListOf(DistanceSetCreateRequest(null, 0, 10.0)),
       )
@@ -141,7 +144,7 @@ class ExerciseServiceTest {
           "Push",
           userId,
           mutableListOf(
-            WorkoutExerciseEntity(workoutExerciseId, workout, UUID.randomUUID(), mutableListOf(), 0)
+            DistanceWorkoutExerciseEntity(workoutExerciseId, workout, UUID.randomUUID(), 0, mutableListOf())
           ),
         ),
       )
@@ -166,8 +169,8 @@ class ExerciseServiceTest {
     val exerciseId2 = UUID.randomUUID()
     val request = ExerciseReorderRequest(workoutId, hashMapOf(Pair(exerciseId1, 1)))
     val workout = WorkoutEntity(workoutId, "legs", userId, mutableListOf())
-    val ex1 = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId1, mutableListOf(), 0)
-    val ex2 = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId2, mutableListOf(), 1)
+    val ex1 = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId1, 0,  mutableListOf())
+    val ex2 = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId2, 1, mutableListOf())
     workout.workoutExercises = mutableListOf(ex1, ex2)
 
     `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
@@ -183,8 +186,8 @@ class ExerciseServiceTest {
     val request =
       ExerciseReorderRequest(workoutId, hashMapOf(Pair(exerciseId1, 1), Pair(exerciseId2, 0)))
     val workout = WorkoutEntity(workoutId, "legs", userId, mutableListOf())
-    val ex1 = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId1, mutableListOf(), 0)
-    val ex2 = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId2, mutableListOf(), 1)
+    val ex1 = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId1, 0,  mutableListOf())
+    val ex2 = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId2, 1, mutableListOf())
     workout.workoutExercises = mutableListOf(ex1, ex2)
 
     `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
@@ -199,8 +202,8 @@ class ExerciseServiceTest {
     val exerciseId2 = UUID.randomUUID()
     val request = ExerciseReorderRequest(workoutId, hashMapOf(Pair(exerciseId1, 1), Pair(exerciseId2, 0)))
     val workout = WorkoutEntity(workoutId, "legs", userId, mutableListOf())
-    val ex1 = WorkoutExerciseEntity(exerciseId1, workout, UUID.randomUUID(), mutableListOf(), 0)
-    val ex2 = WorkoutExerciseEntity(exerciseId2, workout, UUID.randomUUID(), mutableListOf(), 1)
+    val ex1 = WeightWorkoutExerciseEntity(exerciseId1, workout, UUID.randomUUID(), 0,  mutableListOf())
+    val ex2 = WeightWorkoutExerciseEntity(exerciseId2, workout, UUID.randomUUID(), 1, mutableListOf())
     workout.workoutExercises = mutableListOf(ex1, ex2)
     `when`(workoutRepository.findByIdAndUserId(workoutId, userId)).thenReturn(Optional.of(workout))
     exerciseService.reorderExercises(request, userId)
@@ -224,7 +227,7 @@ class ExerciseServiceTest {
     val exerciseId = UUID.randomUUID()
     val workoutId = UUID.randomUUID()
     val workout = WorkoutEntity(workoutId, "legs", UUID.randomUUID())
-    val workoutExercise = WorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, mutableListOf(), 0)
+    val workoutExercise = WeightWorkoutExerciseEntity(UUID.randomUUID(), workout, exerciseId, 0, mutableListOf())
     `when`(workoutExerciseRepository.findByIdAndWorkoutId(exerciseId, workoutId))
       .thenReturn(Optional.of(workoutExercise))
     exerciseService.deleteFromWorkout(exerciseId, workoutId)

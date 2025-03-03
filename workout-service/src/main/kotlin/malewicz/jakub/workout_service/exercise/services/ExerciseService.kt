@@ -6,14 +6,13 @@ import malewicz.jakub.workout_service.exceptions.ResourceNotFoundException
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
+import malewicz.jakub.workout_service.set.dtos.SetType
 import malewicz.jakub.workout_service.set.dtos.TimeSetCreateRequest
 import malewicz.jakub.workout_service.set.dtos.WeightSetCreateRequest
 import malewicz.jakub.workout_service.set.entities.DistanceSetEntity
-import malewicz.jakub.workout_service.set.entities.SetEntity
 import malewicz.jakub.workout_service.set.entities.TimeSetEntity
 import malewicz.jakub.workout_service.set.entities.WeightSetEntity
-import malewicz.jakub.workout_service.workout.entities.WorkoutEntity
-import malewicz.jakub.workout_service.workout.entities.WorkoutExerciseEntity
+import malewicz.jakub.workout_service.workout.entities.*
 import malewicz.jakub.workout_service.workout.repositories.WorkoutExerciseRepository
 import malewicz.jakub.workout_service.workout.repositories.WorkoutRepository
 import org.springframework.stereotype.Service
@@ -30,22 +29,15 @@ class ExerciseService(
           "No workout with id ${exerciseRequest.workoutId} found for user id $userId"
         )
       }
-
-    val sets: MutableList<SetEntity> = createSets(exerciseRequest)
-    val exerciseOrder = getNewExercisesOrder(workout, exerciseRequest.order)
-    val newExercise = WorkoutExerciseEntity(workout, exerciseRequest.exerciseId, sets, exerciseOrder)
-    workout.workoutExercises.forEach {
-      if (it.exerciseOrder >= newExercise.exerciseOrder) {
-        it.exerciseOrder++
-      }
+    val exercise: WorkoutExerciseEntity = when (exerciseRequest.exerciseType) {
+      SetType.WEIGHT -> createWeightExercise(exerciseRequest, workout)
+      SetType.TIME -> createTimeExercise(exerciseRequest, workout)
+      SetType.DISTANCE -> createDistanceExercise(exerciseRequest, workout)
     }
-    workout.workoutExercises.add(newExercise)
-    newExercise.sets.forEach { it.workoutExercise = newExercise }
-    return workoutRepository
-      .save(workout)
-      .workoutExercises
-      .find { it.exerciseOrder == exerciseOrder }
-      ?.id!!
+    workout.workoutExercises.forEachIndexed { index, workoutExercise -> if (index >= exercise.exerciseOrder) workoutExercise.exerciseOrder += 1 }
+    workout.workoutExercises.add(exercise)
+
+    return workoutRepository.save(workout).workoutExercises.find { it.exerciseOrder == exercise.exerciseOrder }?.id!!
   }
 
   fun reorderExercises(reorderRequest: ExerciseReorderRequest, userId: UUID) {
@@ -69,30 +61,77 @@ class ExerciseService(
     workoutRepository.save(workout)
   }
 
-  private fun createSets(exerciseRequest: ExerciseCreateRequest<*>): MutableList<SetEntity> {
-    val timeSet =
-      exerciseRequest.sets
-        .filterIsInstance<TimeSetCreateRequest>()
-        .sortedBy { it.setNumber }
-        .mapIndexed { index, set -> TimeSetEntity(index, set.time, set.weight) }
+  private fun createWeightExercise(
+    exerciseRequest: ExerciseCreateRequest<*>,
+    workout: WorkoutEntity
+  ): WeightWorkoutExerciseEntity {
+    val sets = exerciseRequest.sets.filterIsInstance<WeightSetCreateRequest>()
+      .map { WeightSetEntity(it.setNumber, it.reps, it.weight) }
+      .toMutableList()
 
-    if (timeSet.isNotEmpty()) return timeSet.toMutableList()
+    if (sets.size != exerciseRequest.sets.size) {
+      throw BadRequestException("Provided sets are not weight sets.")
+    }
 
-    val weightSets =
-      exerciseRequest.sets
-        .filterIsInstance<WeightSetCreateRequest>()
-        .sortedBy { it.setNumber }
-        .mapIndexed { index, set -> WeightSetEntity(index, set.reps, set.weight) }
+    sets.forEachIndexed { index, set -> set.setOrder = index }
 
-    if (weightSets.isNotEmpty()) return weightSets.toMutableList()
+    return WeightWorkoutExerciseEntity(
+      workout,
+      exerciseRequest.exerciseId,
+      getNewExercisesOrder(workout, exerciseRequest.order),
+      sets
+    ).apply {
+      sets.forEach { it.workoutExercise = this }
+    }
+  }
 
-    val distanceSets =
-      exerciseRequest.sets
-        .filterIsInstance<DistanceSetCreateRequest>()
-        .sortedBy { it.setNumber }
-        .mapIndexed { index, set -> DistanceSetEntity(index, set.distance) }
+  private fun createTimeExercise(
+    exerciseRequest: ExerciseCreateRequest<*>,
+    workout: WorkoutEntity
+  ): TimeWorkoutExerciseEntity {
+    val sets = exerciseRequest.sets.filterIsInstance<TimeSetCreateRequest>()
+      .map { TimeSetEntity(it.setNumber, it.time, it.weight) }
+      .toMutableList()
 
-    return distanceSets.toMutableList()
+    if (sets.size != exerciseRequest.sets.size) {
+      throw BadRequestException("Provided sets are not weight sets.")
+    }
+
+    sets.forEachIndexed { index, set -> set.setOrder = index }
+
+    return TimeWorkoutExerciseEntity(
+      workout,
+      exerciseRequest.exerciseId,
+      getNewExercisesOrder(workout, exerciseRequest.order),
+      sets
+    ).apply {
+      sets.forEach { it.workoutExercise = this }
+    }
+  }
+
+
+  private fun createDistanceExercise(
+    exerciseRequest: ExerciseCreateRequest<*>,
+    workout: WorkoutEntity
+  ): DistanceWorkoutExerciseEntity {
+    val sets = exerciseRequest.sets.filterIsInstance<DistanceSetCreateRequest>()
+      .map { DistanceSetEntity(it.setNumber, it.distance) }
+      .toMutableList()
+
+    if (sets.size != exerciseRequest.sets.size) {
+      throw BadRequestException("Provided sets are not weight sets.")
+    }
+
+    sets.forEachIndexed { index, set -> set.setOrder = index }
+
+    return DistanceWorkoutExerciseEntity(
+      workout,
+      exerciseRequest.exerciseId,
+      getNewExercisesOrder(workout, exerciseRequest.order),
+      sets
+    ).apply {
+      sets.forEach { it.workoutExercise = this }
+    }
   }
 
   private fun getNewExercisesOrder(workout: WorkoutEntity, order: Int): Int {
