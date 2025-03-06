@@ -33,6 +33,8 @@ dependencies {
 	implementation("org.mapstruct:mapstruct:1.6.3")
 	runtimeOnly("com.h2database:h2")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:postgresql")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	kapt("org.mapstruct:mapstruct-processor:1.6.3")
