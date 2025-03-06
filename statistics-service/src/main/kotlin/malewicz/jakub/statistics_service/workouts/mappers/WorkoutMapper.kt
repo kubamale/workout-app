@@ -10,19 +10,19 @@ import java.util.UUID
 @Mapper(componentModel = "spring", uses = [ExerciseMapper::class])
 abstract class WorkoutMapper {
 
-    private val exerciseMapper: ExerciseMapper = Mappers.getMapper(ExerciseMapper::class.java)
+  private val exerciseMapper: ExerciseMapper = Mappers.getMapper(ExerciseMapper::class.java)
 
-    fun toUserWorkoutEntity(workoutCreateRequest: WorkoutCreateRequest, userId: UUID): UserWorkoutEntity {
-        val userWorkoutEntity = UserWorkoutEntity(
-            userId = userId,
-            workoutId = workoutCreateRequest.workoutId,
-            date = LocalDateTime.now(),
-        )
+  fun toUserWorkoutEntity(workoutCreateRequest: WorkoutCreateRequest, userId: UUID): UserWorkoutEntity {
+    val userWorkoutEntity = UserWorkoutEntity(
+      userId = userId,
+      workoutId = workoutCreateRequest.workoutId,
+      date = LocalDateTime.now(),
+    )
 
-        userWorkoutEntity.exerciseStatisticsEntity =
-            workoutCreateRequest.exercises.map { exerciseMapper.toExerciseStatisticsEntity(it, userWorkoutEntity) }
-                .toMutableList()
+    userWorkoutEntity.exerciseEntity =
+      workoutCreateRequest.exercises.map { exerciseMapper.toExerciseStatisticsEntity(it, userWorkoutEntity) }
+        .toMutableList()
 
-        return userWorkoutEntity
-    }
+    return userWorkoutEntity
+  }
 }

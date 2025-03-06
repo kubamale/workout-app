@@ -10,8 +10,7 @@ data class SetDto(
     @field:Min(0)
     var time: Long?,
     @field:Min(0)
-    var distance: Double?,
-    val setType: SetType
+    var distance: Double?
 )
 
 enum class SetType {

@@ -1,47 +1,51 @@
 package malewicz.jakub.statistics_service.workouts.entities
 
 import jakarta.persistence.*
+import malewicz.jakub.statistics_service.workouts.mappers.Default
 import java.util.*
 
-@Entity(name = "sets")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Entity
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 abstract class SetEntity(
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID? = null,
-    @ManyToOne(fetch = FetchType.LAZY)
-    var exerciseStatistic: ExerciseStatisticsEntity? = null,
+  @Id @GeneratedValue(strategy = GenerationType.UUID)
+  var id: UUID? = null,
+  @ManyToOne(fetch = FetchType.LAZY)
+  var exercise: ExerciseEntity? = null,
 )
 
-@Entity
+@Entity(name = "weight_sets")
 class WeightSetEntity(
-    id: UUID? = null,
-    var reps: Int,
-    var weight: Double,
+  id: UUID? = null,
+  var reps: Int,
+  var weight: Double,
 ) : SetEntity(id) {
-    constructor(reps: Int, weight: Double) : this(
-        null,
-        reps,
-        weight
-    )
+  @Default
+  constructor(reps: Int, weight: Double) : this(
+    null,
+    reps,
+    weight
+  )
 }
 
-@Entity
+@Entity(name = "time_sets")
 class TimeSetEntity(
-    id: UUID? = null,
-    var time: Long,
-    var weight: Double,
+  id: UUID? = null,
+  var time: Long,
+  var weight: Double,
 ) : SetEntity(id) {
-    constructor(time: Long, weight: Double) : this(
-        null,
-        time,
-        weight
-    )
+  @Default
+  constructor(time: Long, weight: Double) : this(
+    null,
+    time,
+    weight
+  )
 }
 
-@Entity
+@Entity(name = "distance_sets")
 class DistanceSetEntity(
-    id: UUID? = null,
-    var distance: Double,
+  id: UUID? = null,
+  var distance: Double,
 ) : SetEntity(id) {
-    constructor(distance: Double) : this(null, distance)
+  @Default
+  constructor(distance: Double) : this(null, distance)
 }

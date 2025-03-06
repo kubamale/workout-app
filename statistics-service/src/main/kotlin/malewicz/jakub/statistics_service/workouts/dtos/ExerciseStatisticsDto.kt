@@ -5,5 +5,6 @@ import java.util.UUID
 data class ExerciseStatisticsDto(
     val exerciseId: UUID,
     val workoutExerciseId: UUID,
+    val type: SetType,
     val sets: MutableList<SetDto> = mutableListOf(),
 )
