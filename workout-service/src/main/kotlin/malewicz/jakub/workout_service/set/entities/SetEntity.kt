@@ -14,7 +14,7 @@ abstract class SetEntity(
   var workoutExercise: WorkoutExerciseEntity? = null,
 )
 
-@Entity
+@Entity(name = "weight_sets")
 class WeightSetEntity(
   id: UUID? = null,
   setOrder: Int,
@@ -25,7 +25,7 @@ class WeightSetEntity(
   constructor(setOrder: Int, reps: Int, weight: Double) : this(null, setOrder, null, reps, weight)
 }
 
-@Entity
+@Entity(name = "time_sets")
 class TimeSetEntity(
   id: UUID? = null,
   setOrder: Int,
@@ -36,7 +36,7 @@ class TimeSetEntity(
   constructor(setOrder: Int, time: Long, weight: Double) : this(null, setOrder, null, time, weight)
 }
 
-@Entity
+@Entity(name = "distance_sets")
 class DistanceSetEntity(
   id: UUID? = null,
   setOrder: Int,
