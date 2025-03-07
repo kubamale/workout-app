@@ -40,3 +40,4 @@ or password reset go through kafka.
  - Spring Boot
  - Kafka
  - H2 Databases
+ - Testcontainers
