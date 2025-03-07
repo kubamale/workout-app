@@ -13,6 +13,9 @@ spring:
             errorDecoder: malewicz.jakub.statistics_service.clients.FeignErrorDecoder
       circuitbreaker:
         enabled: true
+  data:
+    jdbc:
+      dialect: h2
 
 eureka:
   client:
