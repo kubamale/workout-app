@@ -1,4 +1,4 @@
-package malewicz.jakub.statistics_service.workouts.dtos
+package malewicz.jakub.statistics_service.sets.dtos
 
 import jakarta.validation.constraints.Min
 

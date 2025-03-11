@@ -4,6 +4,8 @@ import malewicz.jakub.statistics_service.TestcontainersConfiguration
 import malewicz.jakub.statistics_service.clients.WorkoutClient
 import malewicz.jakub.statistics_service.measurements.entities.MeasurementEntity
 import malewicz.jakub.statistics_service.measurements.repositories.MeasurementRepository
+import malewicz.jakub.statistics_service.sets.dtos.SetType
+import malewicz.jakub.statistics_service.statistics.dtos.ExerciseStatistics
 import malewicz.jakub.statistics_service.statistics.dtos.OverallStatistics
 import malewicz.jakub.statistics_service.workouts.dtos.WorkoutBasicInfo
 import malewicz.jakub.statistics_service.workouts.entities.UserWorkoutEntity
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
 import org.springframework.context.annotation.Import
+import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -39,6 +42,7 @@ class ITGStatisticsTest(
   @MockitoBean
   private lateinit var workoutClient: WorkoutClient
   private val userId = UUID.fromString("ad78bab6-2b61-471e-ae9e-e70a4ccb242b")
+  private val exerciseId = UUID.fromString("8dd7c09c-2135-4002-beca-aa070b9fb463")
 
   @Test
   fun `get overall statistics should return 200 and statistics`() {
@@ -53,6 +57,19 @@ class ITGStatisticsTest(
     assertThat(result.body!!.daysSinceWorkout).isEqualTo(0)
     assertThat(result.body!!.thisWeeksWorkouts).hasSize(1)
     assertThat(result.body!!.thirtyDaysMeasurements.size).isGreaterThanOrEqualTo(1)
+  }
+
+  @Test
+  fun `get exercise statistics should return 200 and statistics`() {
+    val httpEntity = HttpEntity(null, getUserIdInHeader())
+    val responseType = object : ParameterizedTypeReference<Map<SetType, List<ExerciseStatistics>>>() {}
+    val response =
+      restTemplate.exchange("/api/v1/statistics/exercise/$exerciseId", HttpMethod.GET, httpEntity, responseType)
+    assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+    assertThat(response.body).isNotNull
+    assertThat(response.body!![SetType.TIME]).hasSize(1)
+    assertThat(response.body!![SetType.DISTANCE]).hasSize(1)
+    assertThat(response.body!![SetType.WEIGHT]).hasSize(0)
   }
 
   private fun getUserIdInHeader() = HttpHeaders().apply { set("X-User-Id", userId.toString()) }

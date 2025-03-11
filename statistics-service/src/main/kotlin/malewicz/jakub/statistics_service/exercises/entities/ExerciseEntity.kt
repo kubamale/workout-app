@@ -1,6 +1,10 @@
-package malewicz.jakub.statistics_service.workouts.entities
+package malewicz.jakub.statistics_service.exercises.entities
 
 import jakarta.persistence.*
+import malewicz.jakub.statistics_service.sets.entities.DistanceSetEntity
+import malewicz.jakub.statistics_service.sets.entities.TimeSetEntity
+import malewicz.jakub.statistics_service.sets.entities.WeightSetEntity
+import malewicz.jakub.statistics_service.workouts.entities.UserWorkoutEntity
 import java.util.*
 
 @Entity(name = "exercises")

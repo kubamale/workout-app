@@ -1,6 +1,7 @@
 package malewicz.jakub.statistics_service.workouts.entities
 
 import jakarta.persistence.*
+import malewicz.jakub.statistics_service.exercises.entities.ExerciseEntity
 import java.time.LocalDateTime
 import java.util.UUID
 

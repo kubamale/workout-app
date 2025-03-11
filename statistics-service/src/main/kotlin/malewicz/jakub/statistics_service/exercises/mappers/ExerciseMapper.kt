@@ -1,8 +1,13 @@
-package malewicz.jakub.statistics_service.workouts.mappers
+package malewicz.jakub.statistics_service.exercises.mappers
 
-import malewicz.jakub.statistics_service.workouts.dtos.ExerciseStatisticsDto
-import malewicz.jakub.statistics_service.workouts.dtos.SetType
-import malewicz.jakub.statistics_service.workouts.entities.*
+import malewicz.jakub.statistics_service.exercises.dtos.ExerciseStatisticsDto
+import malewicz.jakub.statistics_service.exercises.entities.DistanceExerciseEntity
+import malewicz.jakub.statistics_service.exercises.entities.ExerciseEntity
+import malewicz.jakub.statistics_service.exercises.entities.TimeExerciseEntity
+import malewicz.jakub.statistics_service.exercises.entities.WeightExerciseEntity
+import malewicz.jakub.statistics_service.sets.dtos.SetType
+import malewicz.jakub.statistics_service.sets.mappers.SetMapper
+import malewicz.jakub.statistics_service.workouts.entities.UserWorkoutEntity
 import org.mapstruct.Mapper
 import org.mapstruct.factory.Mappers
 

@@ -1,9 +1,9 @@
 package malewicz.jakub.statistics_service.workouts.controllers
 
 import malewicz.jakub.statistics_service.TestcontainersConfiguration
-import malewicz.jakub.statistics_service.workouts.dtos.ExerciseStatisticsDto
-import malewicz.jakub.statistics_service.workouts.dtos.SetDto
-import malewicz.jakub.statistics_service.workouts.dtos.SetType
+import malewicz.jakub.statistics_service.exercises.dtos.ExerciseStatisticsDto
+import malewicz.jakub.statistics_service.sets.dtos.SetDto
+import malewicz.jakub.statistics_service.sets.dtos.SetType
 import malewicz.jakub.statistics_service.workouts.dtos.WorkoutCreateRequest
 import malewicz.jakub.statistics_service.workouts.repositories.WorkoutRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -41,7 +41,7 @@ class ITGWorkoutTest(
           UUID.randomUUID(),
           SetType.WEIGHT,
           mutableListOf(
-            SetDto(10, 20.0, null,null),
+            SetDto(10, 20.0, null, null),
             SetDto(8, 30.0, null, null)
           )
         )
