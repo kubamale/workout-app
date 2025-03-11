@@ -1,9 +1,9 @@
-package malewicz.jakub.statistics_service.workouts.mappers
+package malewicz.jakub.statistics_service.sets.mappers
 
-import malewicz.jakub.statistics_service.workouts.dtos.SetDto
-import malewicz.jakub.statistics_service.workouts.entities.DistanceSetEntity
-import malewicz.jakub.statistics_service.workouts.entities.TimeSetEntity
-import malewicz.jakub.statistics_service.workouts.entities.WeightSetEntity
+import malewicz.jakub.statistics_service.sets.dtos.SetDto
+import malewicz.jakub.statistics_service.sets.entities.DistanceSetEntity
+import malewicz.jakub.statistics_service.sets.entities.TimeSetEntity
+import malewicz.jakub.statistics_service.sets.entities.WeightSetEntity
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.NullValueCheckStrategy

@@ -1,6 +1,7 @@
-package malewicz.jakub.statistics_service.workouts.entities
+package malewicz.jakub.statistics_service.sets.entities
 
 import jakarta.persistence.*
+import malewicz.jakub.statistics_service.exercises.entities.ExerciseEntity
 import malewicz.jakub.statistics_service.workouts.mappers.Default
 import java.util.*
 

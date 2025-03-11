@@ -1,5 +1,6 @@
 package malewicz.jakub.statistics_service.workouts.mappers
 
+import malewicz.jakub.statistics_service.exercises.mappers.ExerciseMapper
 import malewicz.jakub.statistics_service.workouts.dtos.WorkoutCreateRequest
 import malewicz.jakub.statistics_service.workouts.entities.UserWorkoutEntity
 import org.mapstruct.Mapper

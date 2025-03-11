@@ -1,9 +1,9 @@
 package malewicz.jakub.statistics_service.workouts.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import malewicz.jakub.statistics_service.workouts.dtos.ExerciseStatisticsDto
-import malewicz.jakub.statistics_service.workouts.dtos.SetDto
-import malewicz.jakub.statistics_service.workouts.dtos.SetType
+import malewicz.jakub.statistics_service.exercises.dtos.ExerciseStatisticsDto
+import malewicz.jakub.statistics_service.sets.dtos.SetDto
+import malewicz.jakub.statistics_service.sets.dtos.SetType
 import malewicz.jakub.statistics_service.workouts.dtos.WorkoutCreateRequest
 import malewicz.jakub.statistics_service.workouts.services.WorkoutService
 import org.junit.jupiter.api.Test
