@@ -1,5 +1,7 @@
 package malewicz.jakub.statistics_service.exercises.services
 
+import malewicz.jakub.statistics_service.clients.ExerciseClient
+import malewicz.jakub.statistics_service.exercises.dtos.ExerciseBasicInfo
 import malewicz.jakub.statistics_service.exercises.entities.DistanceExerciseEntity
 import malewicz.jakub.statistics_service.exercises.entities.TimeExerciseEntity
 import malewicz.jakub.statistics_service.exercises.entities.WeightExerciseEntity
@@ -31,6 +33,9 @@ class ExerciseServiceTest {
 
   @Mock
   private lateinit var distanceExerciseService: DistanceExerciseService
+
+  @Mock
+  private lateinit var exerciseClient: ExerciseClient
 
   @InjectMocks
   private lateinit var exerciseService: ExerciseService
@@ -114,6 +119,19 @@ class ExerciseServiceTest {
     )
     `when`(exerciseRepository.findAllByExerciseIdAndWorkoutUserId(exerciseId, userId)).thenReturn(exercises)
     val result = exerciseService.getExercisesForUser(userId, exerciseId)
+    assertThat(result).isEqualTo(exercises)
+  }
+
+  @Test
+  fun `get users exercises should return users exercises`() {
+    val userId = UUID.randomUUID()
+    val exercises =
+      listOf(ExerciseBasicInfo(UUID.randomUUID(), "Legs", "url"), ExerciseBasicInfo(UUID.randomUUID(), "arms", "url"))
+    val ids = exercises.map { it.id }
+
+    `when`(exerciseRepository.getAllExerciseIdsForUser(userId)).thenReturn(ids)
+    `when`(exerciseClient.getBasicExercisesInformation(ids)).thenReturn(exercises)
+    val result = exerciseService.getUsersExercises(userId)
     assertThat(result).isEqualTo(exercises)
   }
 }

@@ -1,7 +1,6 @@
 package malewicz.jakub.exercise_service.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.util.*
 import malewicz.jakub.exercise_service.dtos.ExerciseBasicsResponse
 import malewicz.jakub.exercise_service.dtos.ExerciseDetails
 import malewicz.jakub.exercise_service.dtos.FilterRequest
@@ -24,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.*
 
 @WebMvcTest(controllers = [ExerciseController::class])
 class ExerciseControllerTest(
@@ -116,5 +116,19 @@ class ExerciseControllerTest(
       .andExpect(status().isOk)
       .andExpect(content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(content().json(objectMapper.writeValueAsString(listOf(exercise1, exercise2))))
+  }
+
+  @Test
+  fun `get basic exercise info should return 200 and list of exercises`() {
+    val exercises = listOf(
+      ExerciseBasicsResponse(UUID.randomUUID(), "Legs", "url"),
+      ExerciseBasicsResponse(UUID.randomUUID(), "Biceps", "url"),
+      ExerciseBasicsResponse(UUID.randomUUID(), "Chest", "url"),
+    )
+    `when`(exerciseService.getBasicExercisesInformation(exercises.map { it.id })).thenReturn(exercises)
+    mockMvc.perform(get("/api/v1/exercises/basic").param("ids", exercises.map { it.id }.joinToString(",")))
+      .andExpect(status().isOk)
+      .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(content().json(objectMapper.writeValueAsString(exercises)))
   }
 }
