@@ -138,4 +138,23 @@ class ExerciseServiceTest {
     val result = exerciseService.getAllByIds(ids)
     assertThat(result.size).isEqualTo(2)
   }
+
+  @Test
+  fun `get basic exercise information should return list of basic information`() {
+    val exercise1 =
+      ExerciseEntity(
+        UUID.randomUUID(),
+        "curls",
+        MuscleGroup.BICEPS,
+        "description",
+        ExerciseType.STRENGTH,
+        Equipment.DUMBBELL,
+      )
+    val exerciseBasicInfo = ExerciseBasicsResponse(exercise1.id!!, exercise1.name, exercise1.pictureURL)
+    `when`(exerciseRepository.findAllByIdIn(listOf(exercise1.id!!))).thenReturn(listOf(exercise1))
+    `when`(exerciseMapper.toExerciseBasicResponse(exercise1)).thenReturn(exerciseBasicInfo)
+
+    val response = exerciseService.getBasicExercisesInformation(listOf(exercise1.id!!))
+    assertThat(response).hasSize(1)
+  }
 }

@@ -43,4 +43,10 @@ class ExerciseService(
       .findAllByIdIn(ids)
       .map { exerciseMapper.toExerciseDetails(it) }
       .toList()
+
+  fun getBasicExercisesInformation(ids: List<UUID>): List<ExerciseBasicsResponse> =
+    exerciseRepository
+      .findAllByIdIn(ids)
+      .map { exerciseMapper.toExerciseBasicResponse(it) }
+      .toList()
 }
