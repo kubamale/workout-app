@@ -14,27 +14,31 @@ import java.util.UUID
 @RestController
 @RequestMapping("/api/v1/auth")
 class AuthenticationController(
-    private val authenticationService: AuthenticationService,
-    private val passwordService: PasswordService
+  private val authenticationService: AuthenticationService,
+  private val passwordService: PasswordService
 ) {
 
-    @PostMapping("/login")
-    fun login(@Valid @RequestBody loginRequest: LoginRequest) = authenticationService.login(loginRequest)
+  @PostMapping("/login")
+  fun login(@Valid @RequestBody loginRequest: LoginRequest) = authenticationService.login(loginRequest)
 
-    @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    fun register(@Valid @RequestBody registrationRequest: RegistrationRequest) =
-        authenticationService.registerUser(registrationRequest)
+  @PostMapping("/register")
+  @ResponseStatus(HttpStatus.CREATED)
+  fun register(@Valid @RequestBody registrationRequest: RegistrationRequest) =
+    authenticationService.registerUser(registrationRequest)
 
-    @PostMapping("/activate/{userId}")
-    fun activateAccount(@PathVariable userId: UUID) =
-        authenticationService.activateAccount(userId)
+  @PostMapping("/activate/{userId}")
+  fun activateAccount(@PathVariable userId: UUID) =
+    authenticationService.activateAccount(userId)
 
-    @PostMapping("/forgot-password")
-    fun forgotPassword(@Valid @RequestBody forgotPasswordRequest: ForgotPasswordRequest) =
-        passwordService.forgotPassword(forgotPasswordRequest)
+  @PostMapping("/forgot-password")
+  fun forgotPassword(@Valid @RequestBody forgotPasswordRequest: ForgotPasswordRequest) =
+    passwordService.forgotPassword(forgotPasswordRequest)
 
-    @PostMapping("/reset-password")
-    fun resetPassword(@Valid @RequestBody resetPasswordRequest: ResetPasswordRequest) =
-        passwordService.resetPassword(resetPasswordRequest)
+  @PostMapping("/reset-password")
+  fun resetPassword(@Valid @RequestBody resetPasswordRequest: ResetPasswordRequest) =
+    passwordService.resetPassword(resetPasswordRequest)
+
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @GetMapping
+  fun isUserAuthenticated() = Unit
 }
