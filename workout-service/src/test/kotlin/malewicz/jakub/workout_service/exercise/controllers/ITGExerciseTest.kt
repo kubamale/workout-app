@@ -1,5 +1,6 @@
 package malewicz.jakub.workout_service.exercise.controllers
 
+import malewicz.jakub.workout_service.TestcontainersConfiguration
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseCreateRequest
 import malewicz.jakub.workout_service.exercise.dtos.ExerciseReorderRequest
 import malewicz.jakub.workout_service.set.dtos.DistanceSetCreateRequest
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -27,6 +29,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import java.util.*
 import kotlin.test.Test
 
+@Import(TestcontainersConfiguration::class)
 @Sql(scripts = ["/scripts/clear.sql", "/scripts/init.sql"])
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

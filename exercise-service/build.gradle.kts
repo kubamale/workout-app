@@ -30,10 +30,11 @@ dependencies {
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
 	implementation("org.mapstruct:mapstruct:1.6.3")
 	annotationProcessor("org.hibernate:hibernate-jpamodelgen:6.6.9.Final")
-	runtimeOnly("com.h2database:h2")
+    runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testRuntimeOnly("com.h2database:h2")
 	kapt("org.mapstruct:mapstruct-processor:1.6.3")
 	kapt("org.hibernate:hibernate-jpamodelgen:6.6.9.Final")
 }

@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.TopicBuilder
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
+import org.springframework.kafka.core.KafkaAdmin
 import org.springframework.kafka.core.KafkaAdmin.NewTopics
 import org.springframework.kafka.core.KafkaTemplate
 import org.springframework.kafka.core.ProducerFactory
@@ -16,8 +17,12 @@ import org.springframework.kafka.support.serializer.JsonSerializer
 @Configuration
 class KafkaConfiguration(
     @Value("\${kafka.topics.resetPassword}") private val resetPasswordTopic: String,
-    @Value("\${kafka.topics.activateAccount}") private val activateAccountTopic: String
+    @Value("\${kafka.topics.activateAccount}") private val activateAccountTopic: String,
+    @Value("\${kafka.bootstrapAddress}") private val bootstrapAddress: String
 ) {
+
+    @Bean
+    fun admin() = KafkaAdmin(producerConfigs())
 
     @Bean
     fun notificationTopics() =
@@ -31,7 +36,7 @@ class KafkaConfiguration(
     @Bean
     fun producerConfigs(): Map<String, Any> {
         val props: MutableMap<String, Any> = HashMap()
-        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = "localhost:9092"
+        props[ProducerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapAddress
         props[ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG] = IntegerSerializer::class.java
         props[ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG] = JsonSerializer::class.java
         props[JsonSerializer.ADD_TYPE_INFO_HEADERS] = false
