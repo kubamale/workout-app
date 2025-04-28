@@ -1,0 +1,39 @@
+name: User-Service Deployment
+
+on:
+  push:
+    branches: [ "main","feature/image-deployment" ]
+
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t user-service:latest .
+        working-directory: user-service/
+
+      - name: Save Docker image to tar file
+        run: |
+          docker save user-service:latest -o user-service.tar
+        working-directory: user-service/
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-north-1
+
+      - name: Upload Docker image tar to S3
+        run: |
+          aws s3 cp user-service.tar s3://workout-app-jmal/user-service/user-service.tar
+        working-directory: user-service/
