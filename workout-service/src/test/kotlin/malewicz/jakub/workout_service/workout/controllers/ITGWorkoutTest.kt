@@ -1,5 +1,6 @@
 package malewicz.jakub.workout_service.workout.controllers
 
+import malewicz.jakub.workout_service.TestcontainersConfiguration
 import malewicz.jakub.workout_service.clients.ExerciseClient
 import malewicz.jakub.workout_service.workout.dtos.WorkoutCreateRequest
 import malewicz.jakub.workout_service.workout.dtos.WorkoutDetailsResponse
@@ -13,6 +14,7 @@ import org.mockito.Mockito.`when`
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.client.TestRestTemplate
+import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
@@ -23,6 +25,7 @@ import org.springframework.test.context.jdbc.Sql
 import org.testcontainers.containers.PostgreSQLContainer
 import java.util.*
 
+@Import(TestcontainersConfiguration::class)
 @Sql(scripts = ["/scripts/clear.sql", "/scripts/init.sql"])
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

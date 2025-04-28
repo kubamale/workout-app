@@ -4,6 +4,7 @@ import malewicz.jakub.notification_service.dtos.ActivateAccountMessage
 import malewicz.jakub.notification_service.dtos.ResetPasswordMessage
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.IntegerDeserializer
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory
@@ -13,7 +14,9 @@ import org.springframework.kafka.support.serializer.JsonDeserializer
 
 
 @Configuration
-class KafkaConfiguration {
+class KafkaConfiguration(
+    @Value("\${kafka.bootstrapAddress}") private val bootstrapAddress: String
+) {
 
     @Bean
     fun activateAccountConsumerFactory(): ConsumerFactory<Int, ActivateAccountMessage> {
@@ -49,7 +52,7 @@ class KafkaConfiguration {
 
     private fun factoryConfig(): Map<String, Any> {
         val props: MutableMap<String, Any> = HashMap()
-        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = "127.0.0.1:9092"
+        props[ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG] = bootstrapAddress
         props[ConsumerConfig.GROUP_ID_CONFIG] = "id"
         props[ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG] = IntegerDeserializer::class.java
         props[ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG] = JsonDeserializer::class.java

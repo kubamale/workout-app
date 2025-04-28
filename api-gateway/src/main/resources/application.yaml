@@ -9,6 +9,11 @@ spring:
       discovery:
         locator:
           enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka:8761/eureka
 jwt:
   secret: ${JWT_TOKEN}
-  issuer: ${JWT_ISSUER}
+  issuer: malewicz.jakub.user_service

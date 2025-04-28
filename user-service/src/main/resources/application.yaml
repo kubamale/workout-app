@@ -1,11 +1,18 @@
 spring:
   application:
     name: user-service
-
+  datasource:
+    url: jdbc:postgresql://app-db:5432/postgres?currentSchema=auth
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
 eureka:
   client:
     service-url:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      defaultZone: http://eureka:8761/eureka
+
 jwt:
   secret: ${JWT_SECRET}
   issuer: malewicz.jakub.user_service
@@ -19,3 +26,4 @@ kafka:
   topics:
     resetPassword: reset_password
     activateAccount: activate_account
+  bootstrapAddress: kafka:9092

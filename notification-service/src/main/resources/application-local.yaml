@@ -1,0 +1,10 @@
+kafka:
+  bootstrapAddress: localhost:29092
+
+spring:
+  mail:
+    username: username
+    password: password
+
+gymapp:
+  email: gymapp@ex.com
