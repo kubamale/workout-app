@@ -36,8 +36,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   eureka:
-    build:
-      context: ../discovery-server
+    image: discovery-server:latest
     develop:
       watch:
         - action: rebuild
@@ -47,8 +46,7 @@ services:
       - "8761:8761"
 
   gateway:
-    build:
-      context: ../api-gateway
+    image: api-gateway:latest
     env_file:
       - .env
     develop:
@@ -62,8 +60,7 @@ services:
       - eureka
 
   exercise-service:
-    build:
-      context: ../exercise-service
+    image: exercise-service:latest
     env_file:
       - .env
     develop:
@@ -78,8 +75,7 @@ services:
       - app-db
 
   user-service:
-    build:
-      context: ../user-service
+    image: user-service-latest
     env_file:
       - .env
     develop:
@@ -95,8 +91,7 @@ services:
       - eureka
 
   notification-service:
-    build:
-      context: ../notification-service
+    image: notification-service:latest
     env_file:
       - .env
     develop:
@@ -111,8 +106,7 @@ services:
       - kafka
 
   statistics-service:
-    build:
-      context: ../statistics-service
+    image: statistics-service:latest
     env_file:
       - .env
     develop:
@@ -127,8 +121,7 @@ services:
       - app-db
 
   workout-service:
-    build:
-      context: ../workout-service
+    image: workout-service:latest
     env_file:
       - .env
     develop:
